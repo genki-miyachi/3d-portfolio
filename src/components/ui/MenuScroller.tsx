@@ -179,11 +179,29 @@ export default function MenuScroller({
       rafId = requestAnimationFrame(update);
     };
 
+    // 矢印キーで1アイテムずつ移動
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        scrollToRef.current = centerIndexRef.current + 1;
+      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        scrollToRef.current = centerIndexRef.current - 1;
+      } else if (e.key === 'Enter') {
+        const idx = centerIndexRef.current;
+        if (idx >= 0) {
+          const sectionIndex = (idx % ITEM_COUNT) + 1;
+          onSelect(sectionIndex);
+        }
+      }
+    };
+
     // --- リスナー登録 ---
     window.addEventListener('wheel', onWheel, { passive: true });
     window.addEventListener('touchstart', onTouchStart, { passive: true });
     window.addEventListener('touchmove', onTouchMove, { passive: true });
     window.addEventListener('touchend', onTouchEnd);
+    window.addEventListener('keydown', onKeyDown);
 
     rafId = requestAnimationFrame(update);
 
@@ -193,6 +211,7 @@ export default function MenuScroller({
       window.removeEventListener('touchstart', onTouchStart);
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('keydown', onKeyDown);
     };
   }, [onHover, tripled.length]);
 
