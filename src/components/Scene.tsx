@@ -86,6 +86,7 @@ const closeButtonStyle: React.CSSProperties = {
 export default function Scene() {
   // hoveredSection: メニュースクローラーの中央アイテム（3Dシーン連動）
   // activeSection: モーダルで開いているセクション
+  const [introDone, setIntroDone] = useState(false);
   const [hoveredSection, setHoveredSection] = useState(1);
   const [activeSection, setActiveSection] = useState<number | null>(null);
   const sceneSection = activeSection ?? hoveredSection;
@@ -96,6 +97,10 @@ export default function Scene() {
 
   const handleSelect = useCallback((index: number) => {
     setActiveSection((prev) => (prev === index ? null : index));
+  }, []);
+
+  const handleTypingDone = useCallback(() => {
+    setIntroDone(true);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -122,7 +127,7 @@ export default function Scene() {
         >
           <PerformanceMonitor>
             <CameraRig activeSection={sceneSection} />
-            <ParticleField activeSection={sceneSection} />
+            {introDone && <ParticleField activeSection={sceneSection} />}
             <GridFloor />
           </PerformanceMonitor>
 
@@ -142,11 +147,11 @@ export default function Scene() {
 
       {/* Hero — 左側に常時表示 */}
       <div style={{ ...heroStyle, opacity: activeSection === null ? 1 : 0.15 }}>
-        <HeroSection />
+        <HeroSection onTypingDone={handleTypingDone} />
       </div>
 
       {/* 右側の無限スクロールメニュー */}
-      {activeSection === null && (
+      {introDone && activeSection === null && (
         <MenuScroller
           onHover={handleHover}
           onSelect={handleSelect}
