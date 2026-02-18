@@ -15,6 +15,12 @@ const sections = [
 ];
 
 export default function Navigation({ navDotsRef }: NavigationProps) {
+  const handleClick = (index: number) => {
+    window.dispatchEvent(
+      new CustomEvent('navigate-to-section', { detail: { index } }),
+    );
+  };
+
   return (
     <nav className={styles.root}>
       {sections.map((section, i) => (
@@ -25,6 +31,7 @@ export default function Navigation({ navDotsRef }: NavigationProps) {
             navDotsRef.current[i] = el;
           }}
           aria-label={`Navigate to ${section.label}`}
+          onClick={() => handleClick(i)}
         >
           <span className={styles.dot} />
           <span className={styles.label}>{section.label}</span>

@@ -1,7 +1,10 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useScroll } from '@react-three/drei';
 import * as THREE from 'three';
+
+// 各セクションの peak offset（Scene.tsx の sectionRanges[i][1] と一致させる）
+const sectionPeakOffsets = [0, 0.18, 0.38, 0.58, 0.78, 0.95];
 
 interface Keyframe {
   offset: number;
@@ -11,13 +14,14 @@ interface Keyframe {
 
 // カメラがパーティクル球体の周りをオービット
 // lookAt は全て原点 → 常にパーティクルを見る
+// ゆるく右回りにオービット → 最後に正面に戻る
 const keyframes: Keyframe[] = [
-  { offset: 0.0, position: [0, 0, 25], lookAt: [0, 0, 0] }, // Hero: 正面遠景
-  { offset: 0.18, position: [18, 5, 14], lookAt: [0, 0, 0] }, // About: 右上に回り込む
-  { offset: 0.38, position: [-8, -4, 20], lookAt: [0, 0, 0] }, // Skills: 左からやや近く
-  { offset: 0.58, position: [10, -8, 12], lookAt: [0, 0, 0] }, // Experience: 右下から近い
-  { offset: 0.78, position: [-14, 6, 18], lookAt: [0, 0, 0] }, // Works: 左上に引く
-  { offset: 0.95, position: [0, 0, 14], lookAt: [0, 0, 0] }, // Contact: 正面に寄る
+  { offset: 0.0, position: [0, 2, 24], lookAt: [0, 0, 0] },    // Hero: 正面やや上
+  { offset: 0.18, position: [10, 0, 21], lookAt: [0, 0, 0] },   // About: 右にドリフト
+  { offset: 0.38, position: [16, -2, 16], lookAt: [0, 0, 0] },  // Skills: さらに右、近づく
+  { offset: 0.58, position: [12, 3, 12], lookAt: [0, 0, 0] },   // Experience: 少し上、近い
+  { offset: 0.78, position: [4, -1, 18], lookAt: [0, 0, 0] },   // Works: 正面方向に戻りつつ引く
+  { offset: 0.95, position: [0, 0, 15], lookAt: [0, 0, 0] },    // Contact: 正面、近め
 ];
 
 function smoothstep(min: number, max: number, value: number): number {
@@ -66,6 +70,19 @@ export default function CameraRig({ onScrollOffset }: CameraRigProps) {
   const scroll = useScroll();
   const { camera } = useThree();
   const lookAtTarget = useRef(new THREE.Vector3());
+
+  useEffect(() => {
+    const handleNavigate = (e: Event) => {
+      const { index } = (e as CustomEvent<{ index: number }>).detail;
+      const targetOffset = sectionPeakOffsets[index] ?? 0;
+      const el = scroll.el;
+      el.scrollTop = targetOffset * (el.scrollHeight - el.clientHeight);
+    };
+
+    window.addEventListener('navigate-to-section', handleNavigate);
+    return () =>
+      window.removeEventListener('navigate-to-section', handleNavigate);
+  }, [scroll]);
 
   useFrame((_state, delta) => {
     const { position, lookAt } = getInterpolated(scroll.offset);
