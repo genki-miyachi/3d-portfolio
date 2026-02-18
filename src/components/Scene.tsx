@@ -43,7 +43,7 @@ const overlayStyle: React.CSSProperties = {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  padding: '2rem',
+  padding: '0.75rem',
   transition: 'opacity 0.4s ease',
 };
 
@@ -53,9 +53,9 @@ const cardStyle: React.CSSProperties = {
   WebkitBackdropFilter: 'blur(16px)',
   border: '1px solid rgba(42, 42, 42, 0.6)',
   borderRadius: '8px',
-  padding: '2.5rem',
-  width: 'min(560px, 85vw)',
-  maxHeight: 'calc(100vh - 6rem)',
+  padding: '2rem',
+  width: 'min(640px, calc(100vw - 1.5rem))',
+  maxHeight: 'calc(100vh - 1.5rem)',
   overflowY: 'auto',
   position: 'relative',
   fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
