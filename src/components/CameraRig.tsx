@@ -7,7 +7,6 @@ const cameraPositions: [number, number, number][] = [
   [18, -3, 22], // About: 大きく右、少し下
   [-12, 8, 14], // Skills: 左上から接近
   [20, 6, 10], // Experience: 右上、かなり近い
-  [-8, -4, 26], // Works: 左下、引き
   [0, -2, 12], // Contact: 正面、最も近い
 ];
 

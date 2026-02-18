@@ -1,30 +1,13 @@
+import { contactLinks } from '../../data/portfolio';
 import SectionTitle from '../ui/SectionTitle';
 import styles from './ContactSection.module.css';
-
-const contacts = [
-  {
-    label: 'Email',
-    href: 'mailto:hello@example.com',
-    text: 'hello@example.com',
-  },
-  {
-    label: 'GitHub',
-    href: 'https://github.com/username',
-    text: 'github.com/username',
-  },
-  {
-    label: 'X',
-    href: 'https://x.com/username',
-    text: '@username',
-  },
-];
 
 export default function ContactSection() {
   return (
     <section className={styles.section}>
-      <SectionTitle number="05" title="CONTACT" />
+      <SectionTitle number="04" title="CONTACT" />
       <div className={styles.list}>
-        {contacts.map((c) => (
+        {contactLinks.map((c) => (
           <div key={c.label} className={styles.item}>
             <span className={styles.label}>{c.label}</span>
             <a

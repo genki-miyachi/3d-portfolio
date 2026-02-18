@@ -1,0 +1,232 @@
+{
+  "hero": {
+    "name": "Genki Miyachi",
+    "subtitle": "/ Full Stack Engineer"
+  },
+  "about": {
+    "lines": [
+      "自動車制御ソフトウェア開発でキャリアをスタートし、テスト自動化で業務効率を20倍に改善した経験から「技術で課題を解決する」面白さに目覚める。",
+      "Web領域へ転身後、採用管理SaaSの0→1立ち上げやレガシーシステムのフルリビルドを主導。GraphQL基盤の設計・実装、DBスキーマの再設計、クリーンアーキテクチャの導入など、約8年間でフルスタックエンジニアとしてのスキルセットを確立。",
+      "10名以上のチームでテックリード・スクラムマスターを兼任した経験も持つ。現在はThree.jsを用いた3Dシミュレーションソフトウェアの開発に従事しつつ、副業でNext.jsによる新規SaaSの技術基盤構築を推進中。"
+    ]
+  },
+  "skills": [
+    { "name": "TypeScript", "level": 80, "category": "frontend" },
+    { "name": "React", "level": 75, "category": "frontend" },
+    { "name": "Three.js", "level": 40, "category": "frontend" },
+    { "name": "Lit", "level": 30, "category": "frontend" },
+    { "name": "HTML / CSS", "level": 90, "category": "frontend" },
+    { "name": "Figma", "level": 40, "category": "frontend" },
+    { "name": "Ruby on Rails", "level": 80, "category": "backend" },
+    { "name": "Node.js", "level": 50, "category": "backend" },
+    { "name": "Python", "level": 40, "category": "backend" },
+    { "name": "GraphQL / gRPC", "level": 60, "category": "backend" },
+    { "name": "PostgreSQL", "level": 70, "category": "backend" },
+    { "name": "Golang", "level": 20, "category": "backend" },
+    { "name": "AWS", "level": 50, "category": "infra" },
+    { "name": "Docker", "level": 70, "category": "infra" },
+    { "name": "CI/CD", "level": 60, "category": "infra" },
+    { "name": "Terraform", "level": 15, "category": "infra" }
+  ],
+  "experiences": [
+    {
+      "company": "業務委託",
+      "role": "Full Stack Engineer / Architect",
+      "period": "2025/01 - Present",
+      "description": "物流企業向けBtoB駐車場マッチングSaaSの0→1立ち上げ。",
+      "techs": [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "Prisma",
+        "PostgreSQL",
+        "Auth.js",
+        "Playwright",
+        "AWS"
+      ],
+      "projects": [
+        {
+          "title": "BtoB 休憩用駐車場マッチングサービス",
+          "period": "2025/01 - Present",
+          "role": "フルスタックエンジニア / アーキテクト",
+          "teamSize": "2名",
+          "description": "物流企業向け駐車場マッチングSaaSの0→1立ち上げ。",
+          "achievements": [
+            "認証基盤の構築（Auth.js、OTP認証、JWT、RBAC）",
+            "BFF の構築と型定義の整備",
+            "Repository/Service層によるアーキテクチャ再設計",
+            "CI/CDパイプライン・E2Eテスト基盤の整備"
+          ],
+          "techs": [
+            "Next.js",
+            "TypeScript",
+            "Prisma",
+            "PostgreSQL",
+            "Auth.js",
+            "Playwright",
+            "AWS",
+            "GitHub Actions"
+          ]
+        }
+      ]
+    },
+    {
+      "company": "EarthBrain Inc.",
+      "role": "Full Stack Engineer",
+      "period": "2024/06 - Present",
+      "description": "Three.jsによる土木工事向け3Dシミュレーションソフトウェアの開発。",
+      "techs": [
+        "TypeScript",
+        "React",
+        "Lit",
+        "Three.js",
+        "Node.js",
+        "Python",
+        "AWS"
+      ],
+      "projects": [
+        {
+          "title": "土木向け3Dシミュレーションソフトウェア開発",
+          "period": "2024/06 - Present",
+          "role": "フルスタックエンジニア",
+          "teamSize": "9名（エンジニア7名、PM 2名）",
+          "description": "Three.jsによる土木工事向け3Dシミュレーションソフトウェアの開発。海外拠点のエンジニアと協業。",
+          "achievements": [
+            "基盤コードの共通化",
+            "GIS知識共有の勉強会開催",
+            "AIエージェント活用ルールの整備",
+            "外部ベンダーのテスター管理による品質強化",
+            "UI/UX改善"
+          ],
+          "techs": [
+            "TypeScript",
+            "React",
+            "Lit",
+            "Three.js",
+            "Node.js",
+            "Python",
+            "AWS"
+          ]
+        }
+      ]
+    },
+    {
+      "company": "Techouse Inc.",
+      "role": "Web Developer / Tech Lead",
+      "period": "2020/01 - 2024/06",
+      "description": "採用管理SaaSの開発・運用からフルリビルドまでを主導。",
+      "techs": [
+        "Ruby on Rails",
+        "React",
+        "TypeScript",
+        "GraphQL",
+        "gRPC",
+        "PostgreSQL",
+        "Docker",
+        "AWS",
+        "CircleCI"
+      ],
+      "projects": [
+        {
+          "title": "採用管理SaaS フルリビルド",
+          "period": "2021/08 - 2024/05",
+          "role": "バックエンド / テックリード",
+          "teamSize": "6名（PO 1名、BE 2名、FE 2名、QA 1名）",
+          "description": "前プロジェクトをゼロベースでリビルド。テックリード・スクラムマスターを兼任。",
+          "achievements": [
+            "React/TypeScriptの導入",
+            "Figmaによるデザインプロセスの確立",
+            "DBスキーマの再設計（「人」軸→「応募」軸）",
+            "社内初のGraphQL基盤の設計・実装",
+            "ドキュメント整備（Confluence、ユビキタス言語）",
+            "スクラムイベントの効率化"
+          ],
+          "techs": [
+            "Ruby on Rails",
+            "React",
+            "TypeScript",
+            "GraphQL",
+            "gRPC",
+            "PostgreSQL",
+            "AWS",
+            "Docker",
+            "Figma"
+          ]
+        },
+        {
+          "title": "採用管理SaaS 開発・運用",
+          "period": "2020/01 - 2021/07",
+          "role": "バックエンド / フロントエンド",
+          "teamSize": "3名（PO 1名、BE/FE 2名）",
+          "description": "3番目のエンジニアとして入社。toB向け採用管理システムの開発・運用。",
+          "achievements": [
+            "バグの洗い出しと解消",
+            "脆弱性・パフォーマンス問題の改善（XSS、N+1問題）",
+            "自動テストの実装（RSpec）",
+            "新規機能開発（Twilio、LINE連携）"
+          ],
+          "techs": [
+            "Ruby on Rails",
+            "JavaScript",
+            "Vue.js",
+            "RSpec",
+            "AWS",
+            "CircleCI"
+          ]
+        }
+      ]
+    },
+    {
+      "company": "Progress Technologies Inc.",
+      "role": "Software Engineer",
+      "period": "2017/04 - 2019/12",
+      "description": "自動車部品メーカーR&D部門でEV/ハイブリッド車の制御システム開発。",
+      "techs": ["MATLAB", "Simulink", "C", "Excel VBA", "Shell Script"],
+      "projects": [
+        {
+          "title": "ECU ソフトウェア設計・要件定義",
+          "period": "2018/07 - 2019/12",
+          "role": "設計・要件定義",
+          "teamSize": "2〜3名（事業部20名）",
+          "description": "エンジン制御ユニット（ECU）のソフトウェア設計・開発。新拠点の設立にも参画。",
+          "achievements": [
+            "要件定義の効率化（Excel/VBAによる検索・差分検出ツール開発）"
+          ],
+          "techs": ["Excel VBA", "C", "Shell Script", "Subversion"]
+        },
+        {
+          "title": "PCU 制御システム開発・テスト自動化",
+          "period": "2017/04 - 2018/07",
+          "role": "QA / テスト自動化",
+          "teamSize": "5名（事業部15名）",
+          "description": "EV/ハイブリッド車のパワー制御ユニット（PCU）の制御システム開発。",
+          "achievements": [
+            "テスト項目の標準化",
+            "MATLAB/Simulinkシミュレーションの並列処理化（処理時間1/3に短縮）",
+            "テスト業務の完全自動化（従来比20倍の高速化）"
+          ],
+          "techs": ["MATLAB", "Simulink", "mscript", "Excel VBA"]
+        }
+      ]
+    }
+  ],
+  "contact": {
+    "links": [
+      {
+        "label": "GitHub",
+        "href": "https://github.com/genki-miyachi",
+        "text": "github.com/genki-miyachi"
+      },
+      {
+        "label": "X",
+        "href": "https://x.com/genki_gen",
+        "text": "@genki_gen"
+      },
+      {
+        "label": "LinkedIn",
+        "href": "https://www.linkedin.com/in/%E5%85%83%E6%B0%97-%E5%AE%AE%E5%9C%B0-05a1341b9/",
+        "text": "Genki Miyachi"
+      }
+    ]
+  }
+}

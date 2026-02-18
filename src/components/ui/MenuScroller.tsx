@@ -1,7 +1,7 @@
 import { useRef, useEffect, useCallback } from 'react';
 import styles from './MenuScroller.module.css';
 
-const items = ['About', 'Skills', 'Experience', 'Works', 'Contact'];
+const items = ['About', 'Skills', 'Experience', 'Contact'];
 const ITEM_COUNT = items.length;
 const FRICTION = 0.93;
 const SNAP_THRESHOLD = 0.4;

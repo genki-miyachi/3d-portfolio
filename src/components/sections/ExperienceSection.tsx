@@ -22,6 +22,37 @@ export default function ExperienceSection() {
                 </span>
               ))}
             </div>
+
+            {exp.projects && exp.projects.length > 0 && (
+              <div className={styles.projects}>
+                {exp.projects.map((proj, j) => (
+                  <div key={j} className={styles.project}>
+                    <div className={styles.projectHeader}>
+                      <span className={styles.projectTitle}>{proj.title}</span>
+                      <span className={styles.projectPeriod}>
+                        {proj.period}
+                      </span>
+                    </div>
+                    <div className={styles.projectMeta}>
+                      <span>{proj.role}</span>
+                      <span>{proj.teamSize}</span>
+                    </div>
+                    <ul className={styles.achievements}>
+                      {proj.achievements.map((a, k) => (
+                        <li key={k}>{a}</li>
+                      ))}
+                    </ul>
+                    <div className={styles.techs}>
+                      {proj.techs.map((tech) => (
+                        <span key={tech} className={styles.tagSm}>
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </div>

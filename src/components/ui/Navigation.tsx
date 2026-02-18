@@ -4,8 +4,7 @@ const sections = [
   { label: 'About', number: '01' },
   { label: 'Skills', number: '02' },
   { label: 'Experience', number: '03' },
-  { label: 'Works', number: '04' },
-  { label: 'Contact', number: '05' },
+  { label: 'Contact', number: '04' },
 ];
 
 interface NavigationProps {

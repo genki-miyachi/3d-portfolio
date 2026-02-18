@@ -9,7 +9,6 @@ import HeroSection from './sections/HeroSection';
 import AboutSection from './sections/AboutSection';
 import SkillsSection from './sections/SkillsSection';
 import ExperienceSection from './sections/ExperienceSection';
-import WorksSection from './sections/WorksSection';
 import ContactSection from './sections/ContactSection';
 import MenuScroller from './ui/MenuScroller';
 
@@ -18,7 +17,6 @@ const sectionComponents = [
   <AboutSection key="about" />,
   <SkillsSection key="skills" />,
   <ExperienceSection key="experience" />,
-  <WorksSection key="works" />,
   <ContactSection key="contact" />,
 ];
 
