@@ -3,12 +3,12 @@ import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
 const cameraPositions: [number, number, number][] = [
-  [0, 2, 24], // Hero: 正面やや上
-  [10, 0, 21], // About: 右にドリフト
-  [16, -2, 16], // Skills: さらに右、近づく
-  [12, 3, 12], // Experience: 少し上、近い
-  [4, -1, 18], // Works: 正面方向に戻りつつ引く
-  [0, 0, 15], // Contact: 正面、近め
+  [0, 4, 30], // Hero: 正面、引き気味で全体俯瞰
+  [18, -3, 22], // About: 大きく右、少し下
+  [-12, 8, 14], // Skills: 左上から接近
+  [20, 6, 10], // Experience: 右上、かなり近い
+  [-8, -4, 26], // Works: 左下、引き
+  [0, -2, 12], // Contact: 正面、最も近い
 ];
 
 const Y_AXIS = new THREE.Vector3(0, 1, 0);
