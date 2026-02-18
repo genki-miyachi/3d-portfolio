@@ -187,17 +187,29 @@ export default function ParticleField({ activeSection }: ParticleFieldProps) {
     };
   }, [count]);
 
+  const MAX_RIPPLES = 8;
+
+  const rippleOrigins = useMemo(
+    () => Array.from({ length: MAX_RIPPLES }, () => new THREE.Vector3()),
+    [],
+  );
+  const rippleTimes = useMemo(
+    () => new Float32Array(MAX_RIPPLES).fill(-1),
+    [],
+  );
+  const rippleCount = useRef(0);
+
   const uniforms = useMemo(
     () => ({
       uTime: { value: 0 },
       uMorphIndex: { value: 0 },
-      uRippleOrigin: { value: new THREE.Vector3() },
-      uRippleTime: { value: -1.0 },
+      uRippleOrigins: { value: rippleOrigins },
+      uRippleTimes: { value: rippleTimes },
+      uRippleCount: { value: 0 },
     }),
-    [],
+    [rippleOrigins, rippleTimes],
   );
 
-  const rippleActive = useRef(false);
   const { camera, gl } = useThree();
   const closestPoint = useRef(new THREE.Vector3());
   const raycaster = useRef(new THREE.Raycaster());
@@ -212,14 +224,27 @@ export default function ParticleField({ activeSection }: ParticleFieldProps) {
         new THREE.Vector3(0, 0, 0),
         closestPoint.current,
       );
-      if (!materialRef.current) return;
-      materialRef.current.uniforms.uRippleOrigin.value.copy(
-        closestPoint.current,
-      );
-      materialRef.current.uniforms.uRippleTime.value = 0;
-      rippleActive.current = true;
+      // 空きスロットを探す、なければ最古を上書き
+      let slot = -1;
+      let oldestTime = -1;
+      let oldestSlot = 0;
+      for (let i = 0; i < MAX_RIPPLES; i++) {
+        if (rippleTimes[i] < 0) {
+          slot = i;
+          break;
+        }
+        if (rippleTimes[i] > oldestTime) {
+          oldestTime = rippleTimes[i];
+          oldestSlot = i;
+        }
+      }
+      if (slot === -1) slot = oldestSlot;
+
+      rippleOrigins[slot].copy(closestPoint.current);
+      rippleTimes[slot] = 0;
+      rippleCount.current = Math.min(rippleCount.current + 1, MAX_RIPPLES);
     },
-    [camera, gl],
+    [camera, gl, rippleOrigins, rippleTimes],
   );
 
   useEffect(() => {
@@ -235,10 +260,19 @@ export default function ParticleField({ activeSection }: ParticleFieldProps) {
     morphTarget.current += (activeSection - morphTarget.current) * lerpFactor;
     materialRef.current.uniforms.uMorphIndex.value = morphTarget.current;
 
-    // リップル進行（指数減衰なので自然に収束、タイムアウトなし）
-    if (rippleActive.current) {
-      materialRef.current.uniforms.uRippleTime.value += delta;
+    // 全リップルの時間を進める、十分収束したら無効化
+    let activeCount = 0;
+    for (let i = 0; i < MAX_RIPPLES; i++) {
+      if (rippleTimes[i] >= 0) {
+        rippleTimes[i] += delta;
+        if (rippleTimes[i] > 15) {
+          rippleTimes[i] = -1;
+        } else {
+          activeCount = Math.max(activeCount, i + 1);
+        }
+      }
     }
+    materialRef.current.uniforms.uRippleCount.value = activeCount;
   });
 
   const fullVertexShader = noiseGlsl + '\n' + vertexShader;
