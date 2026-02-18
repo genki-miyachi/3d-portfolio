@@ -6,141 +6,192 @@ import noiseGlsl from '../shaders/noise.glsl?raw';
 import vertexShader from '../shaders/particles.vert?raw';
 import fragmentShader from '../shaders/particles.frag?raw';
 
-// --- Shape samplers ---
+// --- 4D Regular Polytope samplers ---
 
-function sampleSphere(count: number, radius: number): Float32Array {
-  const out = new Float32Array(count * 3);
-  for (let i = 0; i < count; i++) {
-    const theta = Math.random() * Math.PI * 2;
-    const phi = Math.acos(2 * Math.random() - 1);
-    out[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
-    out[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
-    out[i * 3 + 2] = radius * Math.cos(phi);
-  }
-  return out;
+type Vec4 = [number, number, number, number];
+
+interface Polytope4D {
+  vertices: Vec4[];
+  edges: [number, number][];
 }
 
-// テッセラクト（4D超立方体）の辺を3D投影してサンプリング
-function sampleTesseract(count: number, size: number): Float32Array {
-  const out = new Float32Array(count * 3);
-  const half = size / 2;
-
-  // 4D頂点: {-1,+1}^4 = 16頂点
-  const verts4d: [number, number, number, number][] = [];
-  for (let i = 0; i < 16; i++) {
-    verts4d.push([
-      (i & 1 ? 1 : -1) * half,
-      (i & 2 ? 1 : -1) * half,
-      (i & 4 ? 1 : -1) * half,
-      (i & 8 ? 1 : -1) * half,
-    ]);
-  }
-
-  // 辺: ハミング距離1のペア = 32本
+// 4D頂点間の距離²で辺を検出
+function findEdges(
+  vertices: Vec4[],
+  edgeLengthSq: number,
+  tol: number,
+): [number, number][] {
   const edges: [number, number][] = [];
-  for (let i = 0; i < 16; i++) {
-    for (let j = i + 1; j < 16; j++) {
-      if ((((i ^ j) & ((i ^ j) - 1)) === 0)) {
+  for (let i = 0; i < vertices.length; i++) {
+    for (let j = i + 1; j < vertices.length; j++) {
+      let dSq = 0;
+      for (let k = 0; k < 4; k++) {
+        const d = vertices[i][k] - vertices[j][k];
+        dSq += d * d;
+      }
+      if (Math.abs(dSq - edgeLengthSq) < tol) {
         edges.push([i, j]);
       }
     }
   }
+  return edges;
+}
 
-  // 4D→3D 透視投影 (w軸から見る)
-  const project = (v: [number, number, number, number]): [number, number, number] => {
-    const d = 3 * half; // 視点距離
-    const s = d / (d - v[3]);
-    return [v[0] * s, v[1] * s, v[2] * s];
-  };
+// 4D多胞体の辺上にパーティクルをサンプリングし、3Dに透視投影
+function samplePolytope(
+  count: number,
+  size: number,
+  polytope: Polytope4D,
+): Float32Array {
+  const out = new Float32Array(count * 3);
+  const { vertices, edges } = polytope;
+  const half = size / 2;
+
+  // 頂点を [-half, half] に正規化
+  let maxC = 0;
+  for (const v of vertices) {
+    for (let k = 0; k < 4; k++) maxC = Math.max(maxC, Math.abs(v[k]));
+  }
+  const s = half / (maxC || 1);
+  const d = 3 * half; // 投影距離
 
   for (let i = 0; i < count; i++) {
     const edge = edges[Math.floor(Math.random() * edges.length)];
     const t = Math.random();
-    const a = verts4d[edge[0]];
-    const b = verts4d[edge[1]];
-    // 4D辺上を補間してから投影
-    const p4: [number, number, number, number] = [
-      a[0] + (b[0] - a[0]) * t,
-      a[1] + (b[1] - a[1]) * t,
-      a[2] + (b[2] - a[2]) * t,
-      a[3] + (b[3] - a[3]) * t,
-    ];
-    const p3 = project(p4);
-    out[i * 3] = p3[0];
-    out[i * 3 + 1] = p3[1];
-    out[i * 3 + 2] = p3[2];
+    const a = vertices[edge[0]];
+    const b = vertices[edge[1]];
+    const x = (a[0] + (b[0] - a[0]) * t) * s;
+    const y = (a[1] + (b[1] - a[1]) * t) * s;
+    const z = (a[2] + (b[2] - a[2]) * t) * s;
+    const w = (a[3] + (b[3] - a[3]) * t) * s;
+    const proj = d / (d - w);
+    out[i * 3] = x * proj;
+    out[i * 3 + 1] = y * proj;
+    out[i * 3 + 2] = z * proj;
   }
   return out;
 }
 
-function sampleTorus(
-  count: number,
-  R: number,
-  r: number,
-): Float32Array {
-  const out = new Float32Array(count * 3);
-  for (let i = 0; i < count; i++) {
-    const theta = Math.random() * Math.PI * 2;
-    const phi = Math.random() * Math.PI * 2;
-    out[i * 3] = (R + r * Math.cos(phi)) * Math.cos(theta);
-    out[i * 3 + 1] = r * Math.sin(phi);
-    out[i * 3 + 2] = (R + r * Math.cos(phi)) * Math.sin(theta);
-  }
-  return out;
+// 正五胞体 (5-cell): 5頂点, 10辺 — 4D正四面体
+function make5Cell(): Polytope4D {
+  const s5 = Math.sqrt(5);
+  const vertices: Vec4[] = [
+    [1, 1, 1, -1 / s5],
+    [1, -1, -1, -1 / s5],
+    [-1, 1, -1, -1 / s5],
+    [-1, -1, 1, -1 / s5],
+    [0, 0, 0, s5 - 1 / s5],
+  ];
+  // 全10ペアが辺 (完全グラフ K5), 辺長² = 8
+  const edges = findEdges(vertices, 8, 0.01);
+  return { vertices, edges };
 }
 
-function sampleHelix(
-  count: number,
-  radius: number,
-  height: number,
-  turns: number,
-): Float32Array {
-  const out = new Float32Array(count * 3);
-  for (let i = 0; i < count; i++) {
-    const t = Math.random();
-    const angle = t * Math.PI * 2 * turns;
-    // Double helix: two strands
-    const strand = Math.random() > 0.5 ? 0 : Math.PI;
-    out[i * 3] = radius * Math.cos(angle + strand);
-    out[i * 3 + 1] = height * (t - 0.5);
-    out[i * 3 + 2] = radius * Math.sin(angle + strand);
+// 正八胞体 (tesseract / 8-cell): 16頂点, 32辺 — 4D立方体
+function makeTesseract(): Polytope4D {
+  const vertices: Vec4[] = [];
+  for (let i = 0; i < 16; i++) {
+    vertices.push([
+      i & 1 ? 1 : -1,
+      i & 2 ? 1 : -1,
+      i & 4 ? 1 : -1,
+      i & 8 ? 1 : -1,
+    ]);
   }
-  return out;
+  // ハミング距離1のペア, 辺長² = 4
+  const edges = findEdges(vertices, 4, 0.01);
+  return { vertices, edges };
 }
 
-function sampleGeoSurface(
-  count: number,
-  geo: THREE.BufferGeometry,
-): Float32Array {
-  const posAttr = geo.getAttribute('position');
-  const indexAttr = geo.getIndex();
-  const out = new Float32Array(count * 3);
-  const vA = new THREE.Vector3();
-  const vB = new THREE.Vector3();
-  const vC = new THREE.Vector3();
-  const triCount = indexAttr ? indexAttr.count / 3 : posAttr.count / 3;
-
-  for (let i = 0; i < count; i++) {
-    const tri = Math.floor(Math.random() * triCount);
-    if (indexAttr) {
-      vA.fromBufferAttribute(posAttr, indexAttr.getX(tri * 3));
-      vB.fromBufferAttribute(posAttr, indexAttr.getX(tri * 3 + 1));
-      vC.fromBufferAttribute(posAttr, indexAttr.getX(tri * 3 + 2));
-    } else {
-      vA.fromBufferAttribute(posAttr, tri * 3);
-      vB.fromBufferAttribute(posAttr, tri * 3 + 1);
-      vC.fromBufferAttribute(posAttr, tri * 3 + 2);
+// 正十六胞体 (16-cell): 8頂点, 24辺 — 4D正八面体
+function make16Cell(): Polytope4D {
+  const vertices: Vec4[] = [];
+  for (let axis = 0; axis < 4; axis++) {
+    for (const sign of [-1, 1]) {
+      const v: Vec4 = [0, 0, 0, 0];
+      v[axis] = sign;
+      vertices.push(v);
     }
-    let u = Math.random();
-    let v = Math.random();
-    if (u + v > 1) { u = 1 - u; v = 1 - v; }
-    const w = 1 - u - v;
-    out[i * 3] = vA.x * u + vB.x * v + vC.x * w;
-    out[i * 3 + 1] = vA.y * u + vB.y * v + vC.y * w;
-    out[i * 3 + 2] = vA.z * u + vB.z * v + vC.z * w;
   }
-  geo.dispose();
-  return out;
+  // 対蹠点以外が辺, 辺長² = 2
+  const edges = findEdges(vertices, 2, 0.01);
+  return { vertices, edges };
+}
+
+// 正二十四胞体 (24-cell): 24頂点, 96辺
+function make24Cell(): Polytope4D {
+  const vertices: Vec4[] = [];
+  // (±1, ±1, 0, 0) の全置換
+  for (let i = 0; i < 4; i++) {
+    for (let j = i + 1; j < 4; j++) {
+      for (const si of [-1, 1]) {
+        for (const sj of [-1, 1]) {
+          const v: Vec4 = [0, 0, 0, 0];
+          v[i] = si;
+          v[j] = sj;
+          vertices.push(v);
+        }
+      }
+    }
+  }
+  // 辺長² = 2
+  const edges = findEdges(vertices, 2, 0.01);
+  return { vertices, edges };
+}
+
+// 正六百胞体 (600-cell): 120頂点, 720辺
+function make600Cell(): Polytope4D {
+  const phi = (1 + Math.sqrt(5)) / 2;
+  const iphi = phi - 1; // 1/φ = (√5-1)/2
+  const vertices: Vec4[] = [];
+
+  // Group 1: 8頂点 — (±2, 0, 0, 0) の置換
+  for (let axis = 0; axis < 4; axis++) {
+    for (const sign of [-1, 1]) {
+      const v: Vec4 = [0, 0, 0, 0];
+      v[axis] = 2 * sign;
+      vertices.push(v);
+    }
+  }
+
+  // Group 2: 16頂点 — (±1, ±1, ±1, ±1)
+  for (let i = 0; i < 16; i++) {
+    vertices.push([
+      i & 1 ? 1 : -1,
+      i & 2 ? 1 : -1,
+      i & 4 ? 1 : -1,
+      i & 8 ? 1 : -1,
+    ]);
+  }
+
+  // Group 3: 96頂点 — (±φ, ±1, ±1/φ, 0) の偶置換
+  const evenPerms = [
+    [0, 1, 2, 3], [0, 2, 3, 1], [0, 3, 1, 2],
+    [1, 0, 3, 2], [1, 2, 0, 3], [1, 3, 2, 0],
+    [2, 0, 1, 3], [2, 1, 3, 0], [2, 3, 0, 1],
+    [3, 0, 2, 1], [3, 1, 0, 2], [3, 2, 1, 0],
+  ];
+  const base = [phi, 1, iphi, 0];
+
+  for (const perm of evenPerms) {
+    const p = [base[perm[0]], base[perm[1]], base[perm[2]], base[perm[3]]];
+    const nonZero: number[] = [];
+    for (let k = 0; k < 4; k++) {
+      if (p[k] !== 0) nonZero.push(k);
+    }
+    for (let bits = 0; bits < 8; bits++) {
+      const v: Vec4 = [p[0], p[1], p[2], p[3]];
+      for (let b = 0; b < 3; b++) {
+        if (bits & (1 << b)) v[nonZero[b]] = -v[nonZero[b]];
+      }
+      vertices.push(v);
+    }
+  }
+
+  // 辺長² = 6 - 2√5 ≈ 1.528
+  const edgeLengthSq = 6 - 2 * Math.sqrt(5);
+  const edges = findEdges(vertices, edgeLengthSq, 0.05);
+  return { vertices, edges };
 }
 
 function getParticleCount(): number {
@@ -161,14 +212,20 @@ export default function ParticleField({ activeSection }: ParticleFieldProps) {
     const rand = new Float32Array(count);
     for (let i = 0; i < count; i++) rand[i] = Math.random();
 
-    const t0 = sampleSphere(count, 8);
-    const t1 = sampleTesseract(count, 7);
-    const t2 = sampleTorus(count, 7, 2.5);
-    const t3 = sampleHelix(count, 5, 16, 3);
-    const t4 = sampleGeoSurface(count, new THREE.OctahedronGeometry(9, 0));
-    const t5 = sampleSphere(count, 8); // back to sphere
+    const cell5 = make5Cell();
+    const cell8 = makeTesseract();
+    const cell16 = make16Cell();
+    const cell24 = make24Cell();
+    const cell600 = make600Cell();
 
-    // Normals: use t0 (sphere) direction for noise displacement
+    const t0 = samplePolytope(count, 8, cell5); // Hero: 正五胞体
+    const t1 = samplePolytope(count, 8, cell8); // About: 正八胞体
+    const t2 = samplePolytope(count, 8, cell16); // Skills: 正十六胞体
+    const t3 = samplePolytope(count, 8, cell24); // Experience: 正二十四胞体
+    const t4 = samplePolytope(count, 8, cell600); // Contact: 正六百胞体
+    const t5 = samplePolytope(count, 8, cell5); // ループ用
+
+    // Normals: use t0 (5-cell) direction for noise displacement
     const norm = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
       const x = t0[i * 3];
