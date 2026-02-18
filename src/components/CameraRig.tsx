@@ -5,6 +5,7 @@ import * as THREE from 'three';
 
 // 各セクションの peak offset（Scene.tsx の sectionRanges[i][1] と一致させる）
 const sectionPeakOffsets = [0, 0.18, 0.38, 0.58, 0.78, 0.95];
+const MAX_OFFSET = sectionPeakOffsets[sectionPeakOffsets.length - 1];
 
 interface Keyframe {
   offset: number;
@@ -92,6 +93,13 @@ export default function CameraRig({ onScrollOffset }: CameraRigProps) {
     const el = scroll.el;
 
     const onScroll = () => {
+      // 最後のセクション以降はスクロール禁止
+      const maxScroll = el.scrollHeight - el.clientHeight;
+      const maxScrollTop = MAX_OFFSET * maxScroll;
+      if (el.scrollTop > maxScrollTop) {
+        el.scrollTop = maxScrollTop;
+      }
+
       // ユーザーがスクロール中 → スナップ中断
       isSnapping.current = false;
       if (snapTimer.current) clearTimeout(snapTimer.current);
