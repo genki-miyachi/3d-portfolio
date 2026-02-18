@@ -1,0 +1,15 @@
+.section {
+  width: 100%;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.text {
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  line-height: 1.8;
+  color: var(--text-secondary);
+}

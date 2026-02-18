@@ -1,0 +1,21 @@
+.root {
+  margin-bottom: 2rem;
+  font-family: var(--font-mono);
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  font-weight: 700;
+  line-height: 1.2;
+  user-select: none;
+}
+
+.number {
+  color: var(--accent);
+}
+
+.separator {
+  color: var(--text-secondary);
+  margin: 0 0.5em;
+}
+
+.title {
+  color: var(--text-primary);
+}
