@@ -35,7 +35,7 @@
 
 .item {
   flex-shrink: 0;
-  height: 20vh;
+  height: 33vh;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -95,6 +95,6 @@
   }
 
   .item {
-    height: 15vh;
+    height: 28vh;
   }
 }
