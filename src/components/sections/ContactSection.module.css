@@ -25,6 +25,7 @@
 .link {
   color: var(--accent);
   text-decoration: none;
+  pointer-events: auto;
 }
 
 .link:hover {

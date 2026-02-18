@@ -89,7 +89,7 @@ const cardStyle: React.CSSProperties = {
   border: '1px solid rgba(42, 42, 42, 0.6)',
   borderRadius: '8px',
   padding: '2.5rem',
-  pointerEvents: 'auto',
+  pointerEvents: 'none',
   width: 'min(520px, 80vw)',
 };
 
