@@ -120,7 +120,7 @@ void main() {
   vec4 mvPos = modelViewMatrix * vec4(pos, 1.0);
   gl_Position = projectionMatrix * mvPos;
 
-  float size = 1.0 + aRandom * 1.5;
+  float size = 0.6 + aRandom * 0.8;
   gl_PointSize = size * (200.0 / -mvPos.z);
 
   vAlpha = smoothstep(60.0, 10.0, -mvPos.z) * (0.15 + aRandom * 0.35);

@@ -207,8 +207,8 @@ function make600Cell(): Polytope4D {
 }
 
 function getParticleCount(): number {
-  if (typeof window === 'undefined') return 2000;
-  return window.innerWidth < 768 ? 600 : 2000;
+  if (typeof window === 'undefined') return 6000;
+  return window.innerWidth < 768 ? 2000 : 6000;
 }
 
 interface ParticleFieldProps {
