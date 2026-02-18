@@ -37,13 +37,13 @@ function findEdges(
   return edges;
 }
 
-// 4D多胞体の辺上にパーティクルをサンプリングし、3Dに透視投影
-function samplePolytope(
+// 4D多胞体の辺上にパーティクルをサンプリング（4D座標のまま返す）
+function samplePolytope4D(
   count: number,
   size: number,
   polytope: Polytope4D,
 ): Float32Array {
-  const out = new Float32Array(count * 3);
+  const out = new Float32Array(count * 4);
   const { vertices, edges } = polytope;
   const half = size / 2;
 
@@ -53,21 +53,33 @@ function samplePolytope(
     for (let k = 0; k < 4; k++) maxC = Math.max(maxC, Math.abs(v[k]));
   }
   const s = half / (maxC || 1);
-  const d = 3 * half; // 投影距離
 
   for (let i = 0; i < count; i++) {
     const edge = edges[Math.floor(Math.random() * edges.length)];
     const t = Math.random();
     const a = vertices[edge[0]];
     const b = vertices[edge[1]];
-    const x = (a[0] + (b[0] - a[0]) * t) * s;
-    const y = (a[1] + (b[1] - a[1]) * t) * s;
-    const z = (a[2] + (b[2] - a[2]) * t) * s;
-    const w = (a[3] + (b[3] - a[3]) * t) * s;
-    const proj = d / (d - w);
-    out[i * 3] = x * proj;
-    out[i * 3 + 1] = y * proj;
-    out[i * 3 + 2] = z * proj;
+    out[i * 4] = (a[0] + (b[0] - a[0]) * t) * s;
+    out[i * 4 + 1] = (a[1] + (b[1] - a[1]) * t) * s;
+    out[i * 4 + 2] = (a[2] + (b[2] - a[2]) * t) * s;
+    out[i * 4 + 3] = (a[3] + (b[3] - a[3]) * t) * s;
+  }
+  return out;
+}
+
+// position attribute 用に 4D→3D 投影
+function project4Dto3D(
+  data4d: Float32Array,
+  count: number,
+  projDist: number,
+): Float32Array {
+  const out = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    const w = data4d[i * 4 + 3];
+    const proj = projDist / (projDist - w);
+    out[i * 3] = data4d[i * 4] * proj;
+    out[i * 3 + 1] = data4d[i * 4 + 1] * proj;
+    out[i * 3 + 2] = data4d[i * 4 + 2] * proj;
   }
   return out;
 }
@@ -208,7 +220,7 @@ export default function ParticleField({ activeSection }: ParticleFieldProps) {
   const morphTarget = useRef(0);
   const count = useMemo(getParticleCount, []);
 
-  const { targets, randoms, normals } = useMemo(() => {
+  const { targets, position3d, randoms, normals } = useMemo(() => {
     const rand = new Float32Array(count);
     for (let i = 0; i < count; i++) rand[i] = Math.random();
 
@@ -218,19 +230,24 @@ export default function ParticleField({ activeSection }: ParticleFieldProps) {
     const cell24 = make24Cell();
     const cell600 = make600Cell();
 
-    const t0 = samplePolytope(count, 8, cell5); // Hero: 正五胞体
-    const t1 = samplePolytope(count, 8, cell8); // About: 正八胞体
-    const t2 = samplePolytope(count, 8, cell16); // Skills: 正十六胞体
-    const t3 = samplePolytope(count, 8, cell24); // Experience: 正二十四胞体
-    const t4 = samplePolytope(count, 8, cell600); // Contact: 正六百胞体
-    const t5 = samplePolytope(count, 8, cell5); // ループ用
+    const PROJ_DIST = 12; // 3 * half (size=8, half=4)
 
-    // Normals: use t0 (5-cell) direction for noise displacement
+    const t0 = samplePolytope4D(count, 8, cell5); // Hero: 正五胞体
+    const t1 = samplePolytope4D(count, 8, cell8); // About: 正八胞体
+    const t2 = samplePolytope4D(count, 8, cell16); // Skills: 正十六胞体
+    const t3 = samplePolytope4D(count, 8, cell24); // Experience: 正二十四胞体
+    const t4 = samplePolytope4D(count, 8, cell600); // Contact: 正六百胞体
+    const t5 = samplePolytope4D(count, 8, cell5); // ループ用
+
+    // position attribute 用の3D投影 (バウンディングボックス計算用)
+    const pos3d = project4Dto3D(t0, count, PROJ_DIST);
+
+    // Normals: use t0 の3D投影方向 for noise displacement
     const norm = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
-      const x = t0[i * 3];
-      const y = t0[i * 3 + 1];
-      const z = t0[i * 3 + 2];
+      const x = pos3d[i * 3];
+      const y = pos3d[i * 3 + 1];
+      const z = pos3d[i * 3 + 2];
       const len = Math.sqrt(x * x + y * y + z * z) || 1;
       norm[i * 3] = x / len;
       norm[i * 3 + 1] = y / len;
@@ -239,6 +256,7 @@ export default function ParticleField({ activeSection }: ParticleFieldProps) {
 
     return {
       targets: [t0, t1, t2, t3, t4, t5],
+      position3d: pos3d,
       randoms: rand,
       normals: norm,
     };
@@ -260,6 +278,7 @@ export default function ParticleField({ activeSection }: ParticleFieldProps) {
     () => ({
       uTime: { value: 0 },
       uMorphIndex: { value: 0 },
+      uProjectDist: { value: 12 },
       uRippleOrigins: { value: rippleOrigins },
       uRippleTimes: { value: rippleTimes },
       uRippleCount: { value: 0 },
@@ -335,16 +354,17 @@ export default function ParticleField({ activeSection }: ParticleFieldProps) {
   const fullVertexShader = noiseGlsl + '\n' + vertexShader;
 
   return (
-    <points>
+    <points frustumCulled={false}>
       <bufferGeometry>
-        {/* position = initial shape (sphere), used as fallback */}
-        <bufferAttribute attach="attributes-position" args={[targets[0], 3]} />
-        <bufferAttribute attach="attributes-aTarget0" args={[targets[0], 3]} />
-        <bufferAttribute attach="attributes-aTarget1" args={[targets[1], 3]} />
-        <bufferAttribute attach="attributes-aTarget2" args={[targets[2], 3]} />
-        <bufferAttribute attach="attributes-aTarget3" args={[targets[3], 3]} />
-        <bufferAttribute attach="attributes-aTarget4" args={[targets[4], 3]} />
-        <bufferAttribute attach="attributes-aTarget5" args={[targets[5], 3]} />
+        {/* position = 3D投影 (バウンディングボックス用) */}
+        <bufferAttribute attach="attributes-position" args={[position3d, 3]} />
+        {/* 4D座標をシェーダーに渡し、GPU側で回転＋投影 */}
+        <bufferAttribute attach="attributes-aTarget0" args={[targets[0], 4]} />
+        <bufferAttribute attach="attributes-aTarget1" args={[targets[1], 4]} />
+        <bufferAttribute attach="attributes-aTarget2" args={[targets[2], 4]} />
+        <bufferAttribute attach="attributes-aTarget3" args={[targets[3], 4]} />
+        <bufferAttribute attach="attributes-aTarget4" args={[targets[4], 4]} />
+        <bufferAttribute attach="attributes-aTarget5" args={[targets[5], 4]} />
         <bufferAttribute attach="attributes-aRandom" args={[randoms, 1]} />
         <bufferAttribute attach="attributes-normal" args={[normals, 3]} />
       </bufferGeometry>

@@ -1,17 +1,18 @@
 uniform float uTime;
 uniform float uMorphIndex;
+uniform float uProjectDist;
 
 #define MAX_RIPPLES 8
 uniform vec3 uRippleOrigins[MAX_RIPPLES];
 uniform float uRippleTimes[MAX_RIPPLES];
 uniform int uRippleCount;
 
-attribute vec3 aTarget0;
-attribute vec3 aTarget1;
-attribute vec3 aTarget2;
-attribute vec3 aTarget3;
-attribute vec3 aTarget4;
-attribute vec3 aTarget5;
+attribute vec4 aTarget0;
+attribute vec4 aTarget1;
+attribute vec4 aTarget2;
+attribute vec4 aTarget3;
+attribute vec4 aTarget4;
+attribute vec4 aTarget5;
 attribute float aRandom;
 
 varying float vAlpha;
@@ -19,7 +20,7 @@ varying float vRandom;
 
 // noise.glsl will be prepended
 
-vec3 getTarget(int idx) {
+vec4 getTarget(int idx) {
   if (idx <= 0) return aTarget0;
   if (idx == 1) return aTarget1;
   if (idx == 2) return aTarget2;
@@ -28,15 +29,49 @@ vec3 getTarget(int idx) {
   return aTarget5;
 }
 
+// 4D回転: XW, YZ, ZW 平面で独立に回転
+vec4 rotate4D(vec4 p, float time) {
+  float c, s;
+
+  // XW平面 — 超立方体が「裏返る」効果
+  float a1 = time * 0.15;
+  c = cos(a1); s = sin(a1);
+  p = vec4(c * p.x - s * p.w, p.y, p.z, s * p.x + c * p.w);
+
+  // YZ平面 — 通常の3D回転
+  float a2 = time * 0.12;
+  c = cos(a2); s = sin(a2);
+  p = vec4(p.x, c * p.y - s * p.z, s * p.y + c * p.z, p.w);
+
+  // ZW平面 — もう一つの4D回転
+  float a3 = time * 0.09;
+  c = cos(a3); s = sin(a3);
+  p = vec4(p.x, p.y, c * p.z - s * p.w, s * p.z + c * p.w);
+
+  return p;
+}
+
+// 4D→3D 透視投影
+vec3 projectTo3D(vec4 p) {
+  float s = uProjectDist / (uProjectDist - p.w);
+  return p.xyz * s;
+}
+
 void main() {
-  // Morph between two adjacent shapes
+  // Morph between two adjacent 4D shapes
   int lower = int(floor(uMorphIndex));
   int upper = min(lower + 1, 5);
   float t = fract(uMorphIndex);
   // Smoothstep for nicer transition
   t = t * t * (3.0 - 2.0 * t);
 
-  vec3 pos = mix(getTarget(lower), getTarget(upper), t);
+  vec4 pos4d = mix(getTarget(lower), getTarget(upper), t);
+
+  // 4D rotation
+  pos4d = rotate4D(pos4d, uTime);
+
+  // Project to 3D
+  vec3 pos = projectTo3D(pos4d);
 
   // Subtle noise displacement
   float noiseVal = snoise(pos * 0.15 + uTime * 0.04);
