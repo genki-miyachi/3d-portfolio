@@ -4,6 +4,7 @@ import { ScrollControls, PerformanceMonitor } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import CameraRig from './CameraRig';
 import ParticleField from './ParticleField';
+import GridFloor from './GridFloor';
 import HeroSection from './sections/HeroSection';
 import AboutSection from './sections/AboutSection';
 import SkillsSection from './sections/SkillsSection';
@@ -49,6 +50,7 @@ function SceneContent({
         <ScrollControls pages={6} damping={0.3}>
           <CameraRig onScrollOffset={onScrollOffset} />
           <ParticleField />
+          <GridFloor />
         </ScrollControls>
       </PerformanceMonitor>
 
@@ -60,6 +62,7 @@ function SceneContent({
         />
       </EffectComposer>
 
+      <fogExp2 attach="fog" args={['#0a0a0a', 0.018]} />
       <ambientLight intensity={0.5} />
       <color attach="background" args={['#0a0a0a']} />
     </>
