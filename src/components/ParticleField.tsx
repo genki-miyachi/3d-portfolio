@@ -20,22 +20,55 @@ function sampleSphere(count: number, radius: number): Float32Array {
   return out;
 }
 
-function sampleBox(count: number, size: number): Float32Array {
+// テッセラクト（4D超立方体）の辺を3D投影してサンプリング
+function sampleTesseract(count: number, size: number): Float32Array {
   const out = new Float32Array(count * 3);
   const half = size / 2;
-  for (let i = 0; i < count; i++) {
-    // Random point on box surface
-    const face = Math.floor(Math.random() * 6);
-    const u = Math.random() * size - half;
-    const v = Math.random() * size - half;
-    switch (face) {
-      case 0: out[i*3]=half;  out[i*3+1]=u; out[i*3+2]=v; break;
-      case 1: out[i*3]=-half; out[i*3+1]=u; out[i*3+2]=v; break;
-      case 2: out[i*3]=u; out[i*3+1]=half;  out[i*3+2]=v; break;
-      case 3: out[i*3]=u; out[i*3+1]=-half; out[i*3+2]=v; break;
-      case 4: out[i*3]=u; out[i*3+1]=v; out[i*3+2]=half;  break;
-      case 5: out[i*3]=u; out[i*3+1]=v; out[i*3+2]=-half; break;
+
+  // 4D頂点: {-1,+1}^4 = 16頂点
+  const verts4d: [number, number, number, number][] = [];
+  for (let i = 0; i < 16; i++) {
+    verts4d.push([
+      (i & 1 ? 1 : -1) * half,
+      (i & 2 ? 1 : -1) * half,
+      (i & 4 ? 1 : -1) * half,
+      (i & 8 ? 1 : -1) * half,
+    ]);
+  }
+
+  // 辺: ハミング距離1のペア = 32本
+  const edges: [number, number][] = [];
+  for (let i = 0; i < 16; i++) {
+    for (let j = i + 1; j < 16; j++) {
+      if ((((i ^ j) & ((i ^ j) - 1)) === 0)) {
+        edges.push([i, j]);
+      }
     }
+  }
+
+  // 4D→3D 透視投影 (w軸から見る)
+  const project = (v: [number, number, number, number]): [number, number, number] => {
+    const d = 3 * half; // 視点距離
+    const s = d / (d - v[3]);
+    return [v[0] * s, v[1] * s, v[2] * s];
+  };
+
+  for (let i = 0; i < count; i++) {
+    const edge = edges[Math.floor(Math.random() * edges.length)];
+    const t = Math.random();
+    const a = verts4d[edge[0]];
+    const b = verts4d[edge[1]];
+    // 4D辺上を補間してから投影
+    const p4: [number, number, number, number] = [
+      a[0] + (b[0] - a[0]) * t,
+      a[1] + (b[1] - a[1]) * t,
+      a[2] + (b[2] - a[2]) * t,
+      a[3] + (b[3] - a[3]) * t,
+    ];
+    const p3 = project(p4);
+    out[i * 3] = p3[0];
+    out[i * 3 + 1] = p3[1];
+    out[i * 3 + 2] = p3[2];
   }
   return out;
 }
@@ -129,7 +162,7 @@ export default function ParticleField({ activeSection }: ParticleFieldProps) {
     for (let i = 0; i < count; i++) rand[i] = Math.random();
 
     const t0 = sampleSphere(count, 8);
-    const t1 = sampleBox(count, 14);
+    const t1 = sampleTesseract(count, 7);
     const t2 = sampleTorus(count, 7, 2.5);
     const t3 = sampleHelix(count, 5, 16, 3);
     const t4 = sampleGeoSurface(count, new THREE.OctahedronGeometry(9, 0));
