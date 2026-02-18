@@ -11,6 +11,8 @@ const cameraPositions: [number, number, number][] = [
   [0, 0, 15],    // Contact: 正面、近め
 ];
 
+const Y_AXIS = new THREE.Vector3(0, 1, 0);
+
 interface CameraRigProps {
   activeSection: number;
 }
@@ -19,10 +21,17 @@ export default function CameraRig({ activeSection }: CameraRigProps) {
   const { camera } = useThree();
   const lookAtTarget = useRef(new THREE.Vector3());
   const targetPos = useRef(new THREE.Vector3());
+  const orbitAngle = useRef(0);
 
   useFrame((_state, delta) => {
+    // ゆっくり回転し続ける
+    orbitAngle.current += delta * 0.06;
+
     const pos = cameraPositions[activeSection] ?? cameraPositions[0];
     targetPos.current.set(...pos);
+
+    // Y軸周りにオービット回転を適用
+    targetPos.current.applyAxisAngle(Y_AXIS, orbitAngle.current);
 
     const lerpFactor = 1 - Math.exp(-3 * delta);
 

@@ -86,7 +86,7 @@ const closeButtonStyle: React.CSSProperties = {
 export default function Scene() {
   // hoveredSection: メニュースクローラーの中央アイテム（3Dシーン連動）
   // activeSection: モーダルで開いているセクション
-  const [hoveredSection, setHoveredSection] = useState(0);
+  const [hoveredSection, setHoveredSection] = useState(1);
   const [activeSection, setActiveSection] = useState<number | null>(null);
   const sceneSection = activeSection ?? hoveredSection;
 

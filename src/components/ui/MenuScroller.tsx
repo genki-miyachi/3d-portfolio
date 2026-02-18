@@ -21,6 +21,8 @@ export default function MenuScroller({
   const containerRef = useRef<HTMLDivElement>(null);
   const itemEls = useRef<(HTMLButtonElement | null)[]>([]);
   const prevCenter = useRef(-1);
+  const scrollToRef = useRef<number | null>(null);
+  const centerIndexRef = useRef(-1);
 
   const tripled = [...items, ...items, ...items];
 
@@ -32,7 +34,9 @@ export default function MenuScroller({
     el.style.overflow = 'hidden';
 
     const singleHeight = el.scrollHeight / 3;
-    let pos = singleHeight; // 中央コピーの先頭から開始
+    const itemHeight = singleHeight / ITEM_COUNT;
+    // 中央コピーの About（先頭アイテム）を画面中央に配置
+    let pos = singleHeight + itemHeight / 2 - el.clientHeight / 2;
     let vel = 0;
     let touching = false;
     let lastTouchY = 0;
@@ -84,6 +88,18 @@ export default function MenuScroller({
     let rafId: number;
 
     const update = () => {
+      // クリックによるスクロール先指定
+      if (scrollToRef.current !== null) {
+        const targetItem = itemEls.current[scrollToRef.current];
+        if (targetItem) {
+          const targetCenter =
+            targetItem.offsetTop + targetItem.offsetHeight / 2;
+          const containerCenter = pos + el.clientHeight / 2;
+          vel = (targetCenter - containerCenter) * (1 - FRICTION);
+        }
+        scrollToRef.current = null;
+      }
+
       // 物理演算（タッチ中は finger-follow なので不要）
       if (!touching) {
         pos += vel;
@@ -125,15 +141,19 @@ export default function MenuScroller({
         const maxDist = el.clientHeight / 2;
         const t = Math.max(0, 1 - dist / maxDist);
 
-        item.style.opacity = String(0.15 + t * 0.85);
-        item.style.transform = `scale(${0.5 + t * 0.5})`;
-        item.style.filter = t > 0.8 ? 'none' : `blur(${(1 - t) * 1.5}px)`;
+        item.style.opacity = String(0.08 + t * 0.92);
+        item.style.transform = `scale(${0.35 + t * 0.65})`;
+        item.style.filter = t > 0.85 ? 'none' : `blur(${(1 - t) * 3}px)`;
+        item.style.color = t > 0.8 ? 'var(--accent)' : 'var(--text-primary)';
+        item.style.pointerEvents = 'auto';
 
         if (dist < closestDist) {
           closestDist = dist;
           closestIdx = i;
         }
       }
+
+      centerIndexRef.current = closestIdx;
 
       // 3Dシーン連動
       const sectionIndex = (closestIdx % ITEM_COUNT) + 1;
@@ -176,8 +196,12 @@ export default function MenuScroller({
 
   const handleClick = useCallback(
     (i: number) => {
-      const sectionIndex = (i % ITEM_COUNT) + 1;
-      onSelect(sectionIndex);
+      if (i === centerIndexRef.current) {
+        const sectionIndex = (i % ITEM_COUNT) + 1;
+        onSelect(sectionIndex);
+      } else {
+        scrollToRef.current = i;
+      }
     },
     [onSelect],
   );
