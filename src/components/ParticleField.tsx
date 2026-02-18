@@ -1,5 +1,5 @@
-import { useRef, useMemo } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useRef, useMemo, useEffect, useCallback } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
 import noiseGlsl from '../shaders/noise.glsl?raw';
@@ -191,9 +191,41 @@ export default function ParticleField({ activeSection }: ParticleFieldProps) {
     () => ({
       uTime: { value: 0 },
       uMorphIndex: { value: 0 },
+      uRippleOrigin: { value: new THREE.Vector3() },
+      uRippleTime: { value: -1.0 },
     }),
     [],
   );
+
+  const rippleActive = useRef(false);
+  const { camera, gl } = useThree();
+  const closestPoint = useRef(new THREE.Vector3());
+  const raycaster = useRef(new THREE.Raycaster());
+
+  const handleClick = useCallback(
+    (e: MouseEvent) => {
+      const rect = gl.domElement.getBoundingClientRect();
+      const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      const ny = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.current.setFromCamera(new THREE.Vector2(nx, ny), camera);
+      raycaster.current.ray.closestPointToPoint(
+        new THREE.Vector3(0, 0, 0),
+        closestPoint.current,
+      );
+      if (!materialRef.current) return;
+      materialRef.current.uniforms.uRippleOrigin.value.copy(
+        closestPoint.current,
+      );
+      materialRef.current.uniforms.uRippleTime.value = 0;
+      rippleActive.current = true;
+    },
+    [camera, gl],
+  );
+
+  useEffect(() => {
+    gl.domElement.addEventListener('click', handleClick);
+    return () => gl.domElement.removeEventListener('click', handleClick);
+  }, [gl, handleClick]);
 
   useFrame((_state, delta) => {
     if (!materialRef.current) return;
@@ -202,6 +234,11 @@ export default function ParticleField({ activeSection }: ParticleFieldProps) {
     const lerpFactor = 1 - Math.exp(-3 * delta);
     morphTarget.current += (activeSection - morphTarget.current) * lerpFactor;
     materialRef.current.uniforms.uMorphIndex.value = morphTarget.current;
+
+    // リップル進行（指数減衰なので自然に収束、タイムアウトなし）
+    if (rippleActive.current) {
+      materialRef.current.uniforms.uRippleTime.value += delta;
+    }
   });
 
   const fullVertexShader = noiseGlsl + '\n' + vertexShader;

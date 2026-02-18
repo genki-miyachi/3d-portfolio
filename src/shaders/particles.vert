@@ -1,5 +1,7 @@
 uniform float uTime;
 uniform float uMorphIndex;
+uniform vec3 uRippleOrigin;
+uniform float uRippleTime; // -1.0 = inactive
 
 attribute vec3 aTarget0;
 attribute vec3 aTarget1;
@@ -41,6 +43,34 @@ void main() {
   pos.x += sin(uTime * 0.3 + aRandom * 6.28) * 0.12;
   pos.y += cos(uTime * 0.25 + aRandom * 6.28) * 0.12;
   pos.z += sin(uTime * 0.2 + aRandom * 3.14) * 0.08;
+
+  // クリック崩壊 → ゆっくり復帰
+  if (uRippleTime >= 0.0) {
+    float dist = distance(pos, uRippleOrigin);
+    float influence = smoothstep(10.0, 0.0, dist);
+
+    // パーティクルごとにランダムな散乱方向
+    vec3 radial = normalize(pos - uRippleOrigin + 0.001);
+    vec3 scatter;
+    scatter.x = sin(aRandom * 123.45 + 0.7);
+    scatter.y = cos(aRandom * 67.89 + 1.3);
+    scatter.z = sin(aRandom * 45.67 + 2.1);
+    vec3 dir = normalize(mix(radial, scatter, 0.6));
+
+    // 飛距離にバラつき
+    float magnitude = influence * (4.0 + aRandom * 8.0);
+
+    // 時間エンベロープ: 瞬時に爆散 → ゆっくり復帰
+    float envelope;
+    if (uRippleTime < 0.1) {
+      envelope = uRippleTime / 0.1; // 0.1秒で最大到達
+    } else {
+      float returnRate = 0.2 + aRandom * 0.3;
+      envelope = exp(-(uRippleTime - 0.1) * returnRate);
+    }
+
+    pos += dir * magnitude * envelope;
+  }
 
   vec4 mvPos = modelViewMatrix * vec4(pos, 1.0);
   gl_Position = projectionMatrix * mvPos;

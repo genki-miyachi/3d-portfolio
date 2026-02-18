@@ -22,8 +22,13 @@ export default function CameraRig({ activeSection }: CameraRigProps) {
   const lookAtTarget = useRef(new THREE.Vector3());
   const targetPos = useRef(new THREE.Vector3());
   const orbitAngle = useRef(0);
+  const smoothPointer = useRef(new THREE.Vector2());
 
   useFrame((_state, delta) => {
+    // マウスパララックス（pointer を滑らかに追従）
+    const pointer = _state.pointer;
+    smoothPointer.current.lerp(pointer, 1 - Math.exp(-4 * delta));
+
     // ゆっくり回転し続ける
     orbitAngle.current += delta * 0.06;
 
@@ -40,6 +45,10 @@ export default function CameraRig({ activeSection }: CameraRigProps) {
     targetPos.current.applyAxisAngle(Y_AXIS, orbitAngle.current);
 
     const lerpFactor = 1 - Math.exp(-3 * delta);
+
+    // パララックスオフセットを target に加算
+    targetPos.current.x += smoothPointer.current.x * 2;
+    targetPos.current.y += smoothPointer.current.y * 1.5;
 
     camera.position.lerp(targetPos.current, lerpFactor);
     lookAtTarget.current.lerp(new THREE.Vector3(0, 0, 0), lerpFactor);
