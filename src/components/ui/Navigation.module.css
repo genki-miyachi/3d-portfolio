@@ -8,7 +8,6 @@
   flex-direction: column;
   gap: 1.5rem;
   font-family: var(--font-mono);
-  pointer-events: none;
 }
 
 .item {
@@ -20,7 +19,6 @@
   border: none;
   padding: 0;
   flex-direction: row-reverse;
-  pointer-events: auto;
 }
 
 .dot {
@@ -33,8 +31,7 @@
   flex-shrink: 0;
 }
 
-/* data-active は JS から setAttribute で制御 */
-:global([data-active]) .dot {
+.active .dot {
   background: var(--accent);
   border-color: var(--accent);
   box-shadow: var(--accent-glow);
@@ -45,9 +42,14 @@
   color: var(--text-secondary);
   opacity: 0;
   transform: translateX(5px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
   white-space: nowrap;
-  pointer-events: none;
+}
+
+.active .label {
+  opacity: 1;
+  transform: translateX(0);
+  color: var(--accent);
 }
 
 .item:hover .label {
@@ -59,17 +61,6 @@
   border-color: var(--accent);
 }
 
-.number {
-  font-size: 0.6rem;
-  color: var(--text-secondary);
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.item:hover .number {
-  opacity: 1;
-}
-
 @media (max-width: 768px) {
   .root {
     right: 0.75rem;
@@ -77,10 +68,6 @@
   }
 
   .label {
-    display: none;
-  }
-
-  .number {
     display: none;
   }
 }

@@ -1,12 +1,6 @@
-import type { MutableRefObject } from 'react';
 import styles from './Navigation.module.css';
 
-interface NavigationProps {
-  navDotsRef: MutableRefObject<(HTMLElement | null)[]>;
-}
-
 const sections = [
-  { label: 'Hero', number: '00' },
   { label: 'About', number: '01' },
   { label: 'Skills', number: '02' },
   { label: 'Experience', number: '03' },
@@ -14,29 +8,29 @@ const sections = [
   { label: 'Contact', number: '05' },
 ];
 
-export default function Navigation({ navDotsRef }: NavigationProps) {
-  const handleClick = (index: number) => {
-    window.dispatchEvent(
-      new CustomEvent('navigate-to-section', { detail: { index } }),
-    );
-  };
+interface NavigationProps {
+  activeSection: number | null;
+  onSelect: (index: number) => void;
+}
 
+export default function Navigation({ activeSection, onSelect }: NavigationProps) {
   return (
     <nav className={styles.root}>
-      {sections.map((section, i) => (
-        <button
-          key={section.number}
-          className={styles.item}
-          ref={(el) => {
-            navDotsRef.current[i] = el;
-          }}
-          aria-label={`Navigate to ${section.label}`}
-          onClick={() => handleClick(i)}
-        >
-          <span className={styles.dot} />
-          <span className={styles.label}>{section.label}</span>
-        </button>
-      ))}
+      {sections.map((section, i) => {
+        const sectionIndex = i + 1;
+        const isActive = activeSection === sectionIndex;
+        return (
+          <button
+            key={section.number}
+            className={`${styles.item} ${isActive ? styles.active : ''}`}
+            aria-label={section.label}
+            onClick={() => onSelect(sectionIndex)}
+          >
+            <span className={styles.dot} />
+            <span className={styles.label}>{section.label}</span>
+          </button>
+        );
+      })}
     </nav>
   );
 }

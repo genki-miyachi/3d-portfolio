@@ -1,25 +1,10 @@
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { useScroll } from '@react-three/drei';
 import * as THREE from 'three';
 
 import noiseGlsl from '../shaders/noise.glsl?raw';
 import vertexShader from '../shaders/particles.vert?raw';
 import fragmentShader from '../shaders/particles.frag?raw';
-
-// Section peak offsets — must match Scene.tsx sectionRanges[i][1]
-const sectionPeaks = [0, 0.18, 0.38, 0.58, 0.78, 0.95];
-
-function offsetToMorphIndex(offset: number): number {
-  for (let i = 0; i < sectionPeaks.length - 1; i++) {
-    if (offset <= sectionPeaks[i + 1]) {
-      const t =
-        (offset - sectionPeaks[i]) / (sectionPeaks[i + 1] - sectionPeaks[i]);
-      return i + Math.max(0, Math.min(1, t));
-    }
-  }
-  return sectionPeaks.length - 1;
-}
 
 // --- Shape samplers ---
 
@@ -130,9 +115,13 @@ function getParticleCount(): number {
   return window.innerWidth < 768 ? 600 : 2000;
 }
 
-export default function ParticleField() {
+interface ParticleFieldProps {
+  activeSection: number;
+}
+
+export default function ParticleField({ activeSection }: ParticleFieldProps) {
   const materialRef = useRef<THREE.ShaderMaterial>(null);
-  const scroll = useScroll();
+  const morphTarget = useRef(0);
   const count = useMemo(getParticleCount, []);
 
   const { targets, randoms, normals } = useMemo(() => {
@@ -176,9 +165,10 @@ export default function ParticleField() {
   useFrame((_state, delta) => {
     if (!materialRef.current) return;
     materialRef.current.uniforms.uTime.value += delta;
-    materialRef.current.uniforms.uMorphIndex.value = offsetToMorphIndex(
-      scroll.offset,
-    );
+    // activeSection に向かって滑らかに lerp
+    const lerpFactor = 1 - Math.exp(-3 * delta);
+    morphTarget.current += (activeSection - morphTarget.current) * lerpFactor;
+    materialRef.current.uniforms.uMorphIndex.value = morphTarget.current;
   });
 
   const fullVertexShader = noiseGlsl + '\n' + vertexShader;

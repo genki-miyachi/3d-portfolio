@@ -1,6 +1,6 @@
-import { useRef, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { ScrollControls, PerformanceMonitor } from '@react-three/drei';
+import { PerformanceMonitor } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import CameraRig from './CameraRig';
 import ParticleField from './ParticleField';
@@ -11,188 +11,190 @@ import SkillsSection from './sections/SkillsSection';
 import ExperienceSection from './sections/ExperienceSection';
 import WorksSection from './sections/WorksSection';
 import ContactSection from './sections/ContactSection';
-import Navigation from './ui/Navigation';
+import MenuScroller from './ui/MenuScroller';
 
-// [fadeInStart, fullyVisible, fadeOutEnd]
-const sectionRanges: [number, number, number][] = [
-  [-0.01, 0, 0.12],
-  [0.1, 0.18, 0.3],
-  [0.28, 0.38, 0.5],
-  [0.48, 0.58, 0.7],
-  [0.68, 0.78, 0.88],
-  [0.85, 0.95, 1.01],
+const sectionComponents = [
+  null, // 0 = Hero (not in modal)
+  <AboutSection key="about" />,
+  <SkillsSection key="skills" />,
+  <ExperienceSection key="experience" />,
+  <WorksSection key="works" />,
+  <ContactSection key="contact" />,
 ];
 
-function calcFade(
-  offset: number,
-  [start, peak, end]: [number, number, number],
-) {
-  if (offset <= start) return { opacity: 0, translateY: 40 };
-  if (offset <= peak) {
-    const t = (offset - start) / (peak - start);
-    return { opacity: t, translateY: 40 * (1 - t) };
-  }
-  if (offset <= end) {
-    const t = (offset - peak) / (end - peak);
-    return { opacity: 1 - t, translateY: -30 * t };
-  }
-  return { opacity: 0, translateY: -30 };
-}
-
-function SceneContent({
-  onScrollOffset,
-}: {
-  onScrollOffset: (offset: number) => void;
-}) {
-  return (
-    <>
-      <PerformanceMonitor>
-        <ScrollControls pages={6} damping={0.3}>
-          <CameraRig onScrollOffset={onScrollOffset} />
-          <ParticleField />
-          <GridFloor />
-        </ScrollControls>
-      </PerformanceMonitor>
-
-      <EffectComposer>
-        <Bloom
-          luminanceThreshold={0.2}
-          luminanceSmoothing={0.9}
-          intensity={0.8}
-        />
-      </EffectComposer>
-
-      <fogExp2 attach="fog" args={['#0a0a0a', 0.018]} />
-      <ambientLight intensity={0.5} />
-      <color attach="background" args={['#0a0a0a']} />
-    </>
-  );
-}
-
-const baseSectionStyle: React.CSSProperties = {
+const heroStyle: React.CSSProperties = {
   position: 'fixed',
-  inset: 0,
+  left: 0,
+  top: 0,
+  bottom: 0,
+  width: '60vw',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
-  padding: '0 8vw',
-  fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
+  padding: '0 6vw',
   zIndex: 10,
   pointerEvents: 'none',
-  willChange: 'opacity, transform',
+  fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
+  transition: 'opacity 0.4s ease',
+};
+
+const overlayStyle: React.CSSProperties = {
+  position: 'fixed',
+  inset: 0,
+  zIndex: 30,
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: '2rem',
+  transition: 'opacity 0.4s ease',
 };
 
 const cardStyle: React.CSSProperties = {
-  background: 'rgba(10, 10, 10, 0.65)',
-  backdropFilter: 'blur(12px)',
-  WebkitBackdropFilter: 'blur(12px)',
+  background: 'rgba(10, 10, 10, 0.8)',
+  backdropFilter: 'blur(16px)',
+  WebkitBackdropFilter: 'blur(16px)',
   border: '1px solid rgba(42, 42, 42, 0.6)',
   borderRadius: '8px',
   padding: '2.5rem',
-  pointerEvents: 'none',
-  width: 'min(520px, 80vw)',
+  width: 'min(560px, 85vw)',
+  maxHeight: 'calc(100vh - 6rem)',
+  overflowY: 'auto',
+  position: 'relative',
+  fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
+  transition: 'transform 0.4s ease',
 };
 
-// Hero: 中央、それ以降: 左右交互
-const sectionAligns: ('center' | 'flex-start' | 'flex-end')[] = [
-  'center',     // Hero
-  'flex-start',  // About — 左
-  'flex-end',    // Skills — 右
-  'flex-start',  // Experience — 左
-  'flex-end',    // Works — 右
-  'flex-start',  // Contact — 左
-];
+const closeButtonStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: '1rem',
+  right: '1rem',
+  background: 'none',
+  border: '1px solid var(--border)',
+  borderRadius: '4px',
+  color: 'var(--text-secondary)',
+  fontSize: '1rem',
+  width: '2rem',
+  height: '2rem',
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontFamily: 'var(--font-mono)',
+  transition: 'color 0.2s, border-color 0.2s',
+};
 
 export default function Scene() {
-  const sectionEls = useRef<(HTMLDivElement | null)[]>([]);
-  const navDotsRef = useRef<(HTMLElement | null)[]>([]);
-  const offsetRef = useRef(0);
+  // hoveredSection: メニュースクローラーの中央アイテム（3Dシーン連動）
+  // activeSection: モーダルで開いているセクション
+  const [hoveredSection, setHoveredSection] = useState(0);
+  const [activeSection, setActiveSection] = useState<number | null>(null);
+  const sceneSection = activeSection ?? hoveredSection;
 
-  // rAF loop — DOM 直接操作、setState しない
+  const handleHover = useCallback((index: number) => {
+    setHoveredSection(index);
+  }, []);
+
+  const handleSelect = useCallback((index: number) => {
+    setActiveSection((prev) => (prev === index ? null : index));
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setActiveSection(null);
+  }, []);
+
+  // Escape キーで閉じる
   useEffect(() => {
-    let rafId: number;
-    let prevActive = -1;
-
-    const update = () => {
-      const offset = offsetRef.current;
-
-      // セクション fade
-      for (let i = 0; i < sectionRanges.length; i++) {
-        const el = sectionEls.current[i];
-        if (!el) continue;
-        const { opacity, translateY } = calcFade(offset, sectionRanges[i]);
-        const visible = opacity > 0.01;
-        el.style.opacity = String(opacity);
-        el.style.transform = `translateY(${translateY}px)`;
-        el.style.visibility = visible ? 'visible' : 'hidden';
-      }
-
-      // Navigation active dot
-      let best = 0;
-      let bestOp = 0;
-      for (let i = 0; i < sectionRanges.length; i++) {
-        const { opacity } = calcFade(offset, sectionRanges[i]);
-        if (opacity > bestOp) {
-          bestOp = opacity;
-          best = i;
-        }
-      }
-      if (best !== prevActive) {
-        navDotsRef.current[prevActive]?.removeAttribute('data-active');
-        navDotsRef.current[best]?.setAttribute('data-active', '');
-        prevActive = best;
-      }
-
-      rafId = requestAnimationFrame(update);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setActiveSection(null);
     };
-    rafId = requestAnimationFrame(update);
-    return () => cancelAnimationFrame(rafId);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
   }, []);
-
-  const handleScrollOffset = useCallback((offset: number) => {
-    offsetRef.current = offset;
-  }, []);
-
-  const setSectionRef = (i: number) => (el: HTMLDivElement | null) => {
-    sectionEls.current[i] = el;
-  };
-
-  const sections = [
-    <HeroSection key="hero" />,
-    <AboutSection key="about" />,
-    <SkillsSection key="skills" />,
-    <ExperienceSection key="experience" />,
-    <WorksSection key="works" />,
-    <ContactSection key="contact" />,
-  ];
 
   return (
     <>
+      {/* 3D Canvas */}
       <div style={{ position: 'fixed', inset: 0, zIndex: 0 }}>
         <Canvas
           dpr={[1, 2]}
           gl={{ antialias: true, alpha: false }}
           camera={{ fov: 60, near: 0.1, far: 200 }}
         >
-          <SceneContent onScrollOffset={handleScrollOffset} />
+          <PerformanceMonitor>
+            <CameraRig activeSection={sceneSection} />
+            <ParticleField activeSection={sceneSection} />
+            <GridFloor />
+          </PerformanceMonitor>
+
+          <EffectComposer>
+            <Bloom
+              luminanceThreshold={0.2}
+              luminanceSmoothing={0.9}
+              intensity={0.8}
+            />
+          </EffectComposer>
+
+          <fogExp2 attach="fog" args={['#0a0a0a', 0.018]} />
+          <ambientLight intensity={0.5} />
+          <color attach="background" args={['#0a0a0a']} />
         </Canvas>
       </div>
 
-      {sections.map((section, i) => (
-        <div
-          key={i}
-          ref={setSectionRef(i)}
-          style={{ ...baseSectionStyle, alignItems: sectionAligns[i] }}
-        >
-          {i === 0 ? (
-            section
-          ) : (
-            <div style={cardStyle}>{section}</div>
-          )}
-        </div>
-      ))}
+      {/* Hero — 左側に常時表示 */}
+      <div style={{ ...heroStyle, opacity: activeSection === null ? 1 : 0.15 }}>
+        <HeroSection />
+      </div>
 
-      <Navigation navDotsRef={navDotsRef} />
+      {/* 右側の無限スクロールメニュー */}
+      {activeSection === null && (
+        <MenuScroller
+          onHover={handleHover}
+          onSelect={handleSelect}
+          activeSection={activeSection}
+        />
+      )}
+
+      {/* Modal overlay */}
+      {sectionComponents.map((component, i) => {
+        if (i === 0 || !component) return null;
+        const isActive = activeSection === i;
+        return (
+          <div
+            key={i}
+            style={{
+              ...overlayStyle,
+              opacity: isActive ? 1 : 0,
+              pointerEvents: isActive ? 'auto' : 'none',
+            }}
+            onClick={handleClose}
+          >
+            <div
+              style={{
+                ...cardStyle,
+                transform: isActive ? 'translateY(0)' : 'translateY(20px)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                style={closeButtonStyle}
+                onClick={handleClose}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = 'var(--accent)';
+                  e.currentTarget.style.borderColor = 'var(--accent)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = 'var(--text-secondary)';
+                  e.currentTarget.style.borderColor = 'var(--border)';
+                }}
+                aria-label="Close"
+              >
+                ×
+              </button>
+              {component}
+            </div>
+          </div>
+        );
+      })}
     </>
   );
 }
