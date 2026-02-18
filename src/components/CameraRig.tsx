@@ -66,17 +66,69 @@ interface CameraRigProps {
   onScrollOffset?: (offset: number) => void;
 }
 
+function findNearestPeak(offset: number): number {
+  let best = 0;
+  let bestDist = Infinity;
+  for (const peak of sectionPeakOffsets) {
+    const d = Math.abs(offset - peak);
+    if (d < bestDist) {
+      bestDist = d;
+      best = peak;
+    }
+  }
+  return best;
+}
+
 export default function CameraRig({ onScrollOffset }: CameraRigProps) {
   const scroll = useScroll();
   const { camera } = useThree();
   const lookAtTarget = useRef(new THREE.Vector3());
+  const snapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isSnapping = useRef(false);
+  const prevScrollTop = useRef(0);
 
+  // スクロール停止を検知してスナップ
+  useEffect(() => {
+    const el = scroll.el;
+
+    const onScroll = () => {
+      // ユーザーがスクロール中 → スナップ中断
+      isSnapping.current = false;
+      if (snapTimer.current) clearTimeout(snapTimer.current);
+
+      snapTimer.current = setTimeout(() => {
+        const maxScroll = el.scrollHeight - el.clientHeight;
+        if (maxScroll <= 0) return;
+        const currentOffset = el.scrollTop / maxScroll;
+        const targetOffset = findNearestPeak(currentOffset);
+        const targetScrollTop = targetOffset * maxScroll;
+
+        // 既に十分近ければスナップ不要
+        if (Math.abs(el.scrollTop - targetScrollTop) < 2) return;
+
+        isSnapping.current = true;
+        prevScrollTop.current = el.scrollTop;
+      }, 150);
+    };
+
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      el.removeEventListener('scroll', onScroll);
+      if (snapTimer.current) clearTimeout(snapTimer.current);
+    };
+  }, [scroll]);
+
+  // navigate-to-section イベント
   useEffect(() => {
     const handleNavigate = (e: Event) => {
       const { index } = (e as CustomEvent<{ index: number }>).detail;
       const targetOffset = sectionPeakOffsets[index] ?? 0;
       const el = scroll.el;
-      el.scrollTop = targetOffset * (el.scrollHeight - el.clientHeight);
+      const maxScroll = el.scrollHeight - el.clientHeight;
+      isSnapping.current = true;
+      prevScrollTop.current = el.scrollTop;
+      // findNearestPeak will match, just set target directly
+      el.dataset.snapTarget = String(targetOffset * maxScroll);
     };
 
     window.addEventListener('navigate-to-section', handleNavigate);
@@ -85,6 +137,29 @@ export default function CameraRig({ onScrollOffset }: CameraRigProps) {
   }, [scroll]);
 
   useFrame((_state, delta) => {
+    // スナップアニメーション（scrollTop を毎フレーム lerp）
+    if (isSnapping.current) {
+      const el = scroll.el;
+      const maxScroll = el.scrollHeight - el.clientHeight;
+
+      let targetScrollTop: number;
+      if (el.dataset.snapTarget) {
+        targetScrollTop = Number(el.dataset.snapTarget);
+      } else {
+        const currentOffset = el.scrollTop / maxScroll;
+        targetScrollTop = findNearestPeak(currentOffset) * maxScroll;
+      }
+
+      const diff = targetScrollTop - el.scrollTop;
+      if (Math.abs(diff) < 0.5) {
+        el.scrollTop = targetScrollTop;
+        isSnapping.current = false;
+        delete el.dataset.snapTarget;
+      } else {
+        el.scrollTop += diff * (1 - Math.exp(-5 * delta));
+      }
+    }
+
     const { position, lookAt } = getInterpolated(scroll.offset);
 
     const lerpFactor = 1 - Math.exp(-3 * delta);
