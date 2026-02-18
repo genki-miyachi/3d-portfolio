@@ -148,13 +148,20 @@ export default function Scene() {
         <HeroSection onTypingDone={handleTypingDone} />
       </div>
 
-      {/* 右側の無限スクロールメニュー */}
-      {introDone && activeSection === null && (
-        <MenuScroller
-          onHover={handleHover}
-          onSelect={handleSelect}
-          activeSection={activeSection}
-        />
+      {/* 右側の無限スクロールメニュー（アンマウントせず隠してスクロール位置を保持） */}
+      {introDone && (
+        <div
+          style={{
+            visibility: activeSection === null ? 'visible' : 'hidden',
+            pointerEvents: activeSection === null ? 'auto' : 'none',
+          }}
+        >
+          <MenuScroller
+            onHover={handleHover}
+            onSelect={handleSelect}
+            activeSection={activeSection}
+          />
+        </div>
       )}
 
       {/* Modal overlay */}

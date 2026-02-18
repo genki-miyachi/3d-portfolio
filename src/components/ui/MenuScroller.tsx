@@ -23,6 +23,8 @@ export default function MenuScroller({
   const prevCenter = useRef(-1);
   const scrollToRef = useRef<number | null>(null);
   const centerIndexRef = useRef(-1);
+  const activeSectionRef = useRef(activeSection);
+  activeSectionRef.current = activeSection;
 
   const tripled = [...items, ...items, ...items];
 
@@ -167,7 +169,7 @@ export default function MenuScroller({
         const item = itemEls.current[i];
         if (!item) continue;
         const idx = (i % ITEM_COUNT) + 1;
-        if (idx === activeSection) {
+        if (idx === activeSectionRef.current) {
           item.classList.add(styles.active);
         } else {
           item.classList.remove(styles.active);
@@ -192,7 +194,7 @@ export default function MenuScroller({
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('touchend', onTouchEnd);
     };
-  }, [onHover, activeSection, tripled.length]);
+  }, [onHover, tripled.length]);
 
   const handleClick = useCallback(
     (i: number) => {
