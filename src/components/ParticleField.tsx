@@ -264,14 +264,10 @@ export default function ParticleField({ activeSection }: ParticleFieldProps) {
 
   const MAX_RIPPLES = 8;
 
-  const rippleOrigins = useMemo(
-    () => Array.from({ length: MAX_RIPPLES }, () => new THREE.Vector3()),
-    [],
+  const rippleOrigins = useRef(
+    Array.from({ length: MAX_RIPPLES }, () => new THREE.Vector3()),
   );
-  const rippleTimes = useMemo(
-    () => new Float32Array(MAX_RIPPLES).fill(-1),
-    [],
-  );
+  const rippleTimes = useRef(new Float32Array(MAX_RIPPLES).fill(-1));
   const rippleCount = useRef(0);
 
   const uniforms = useMemo(
@@ -279,48 +275,51 @@ export default function ParticleField({ activeSection }: ParticleFieldProps) {
       uTime: { value: 0 },
       uMorphIndex: { value: 0 },
       uProjectDist: { value: 12 },
-      uRippleOrigins: { value: rippleOrigins },
-      uRippleTimes: { value: rippleTimes },
+      uRippleOrigins: { value: rippleOrigins.current },
+      uRippleTimes: { value: rippleTimes.current },
       uRippleCount: { value: 0 },
     }),
-    [rippleOrigins, rippleTimes],
+    [],
   );
 
   const { camera, gl } = useThree();
   const closestPoint = useRef(new THREE.Vector3());
   const raycaster = useRef(new THREE.Raycaster());
+  const tempVec2 = useRef(new THREE.Vector2());
+  const origin = useRef(new THREE.Vector3());
 
   const handleClick = useCallback(
     (e: MouseEvent) => {
       const rect = gl.domElement.getBoundingClientRect();
       const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       const ny = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-      raycaster.current.setFromCamera(new THREE.Vector2(nx, ny), camera);
+      raycaster.current.setFromCamera(tempVec2.current.set(nx, ny), camera);
       raycaster.current.ray.closestPointToPoint(
-        new THREE.Vector3(0, 0, 0),
+        origin.current.set(0, 0, 0),
         closestPoint.current,
       );
       // 空きスロットを探す、なければ最古を上書き
       let slot = -1;
       let oldestTime = -1;
       let oldestSlot = 0;
+      const times = rippleTimes.current;
       for (let i = 0; i < MAX_RIPPLES; i++) {
-        if (rippleTimes[i] < 0) {
+        if (times[i] < 0) {
           slot = i;
           break;
         }
-        if (rippleTimes[i] > oldestTime) {
-          oldestTime = rippleTimes[i];
+        if (times[i] > oldestTime) {
+          oldestTime = times[i];
           oldestSlot = i;
         }
       }
       if (slot === -1) slot = oldestSlot;
 
-      rippleOrigins[slot].copy(closestPoint.current);
-      rippleTimes[slot] = 0;
+      rippleOrigins.current[slot].copy(closestPoint.current);
+      times[slot] = 0;
       rippleCount.current = Math.min(rippleCount.current + 1, MAX_RIPPLES);
     },
-    [camera, gl, rippleOrigins, rippleTimes],
+    [camera, gl],
   );
 
   useEffect(() => {
@@ -337,12 +336,13 @@ export default function ParticleField({ activeSection }: ParticleFieldProps) {
     materialRef.current.uniforms.uMorphIndex.value = morphTarget.current;
 
     // 全リップルの時間を進める、十分収束したら無効化
+    const times = rippleTimes.current;
     let activeCount = 0;
     for (let i = 0; i < MAX_RIPPLES; i++) {
-      if (rippleTimes[i] >= 0) {
-        rippleTimes[i] += delta;
-        if (rippleTimes[i] > 15) {
-          rippleTimes[i] = -1;
+      if (times[i] >= 0) {
+        times[i] += delta;
+        if (times[i] > 15) {
+          times[i] = -1;
         } else {
           activeCount = Math.max(activeCount, i + 1);
         }

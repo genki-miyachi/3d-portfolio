@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -38,6 +38,13 @@ export default function GridFloor() {
     });
     return { geometry, material };
   }, []);
+
+  useEffect(() => {
+    return () => {
+      grid.geometry.dispose();
+      grid.material.dispose();
+    };
+  }, [grid]);
 
   // グリッドをカメラのXZ位置にスナップ（グリッド間隔単位）して端を見せない
   useFrame(() => {

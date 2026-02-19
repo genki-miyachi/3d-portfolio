@@ -7,8 +7,8 @@ export default function ExperienceSection() {
     <section className={styles.section}>
       <SectionTitle number="03" title="EXPERIENCE" />
       <div className={styles.timeline}>
-        {experiences.map((exp, i) => (
-          <div key={i} className={styles.item}>
+        {experiences.map((exp) => (
+          <div key={`${exp.company}-${exp.period}`} className={styles.item}>
             <div className={styles.company}>{exp.company}</div>
             <div className={styles.meta}>
               <span className={styles.role}>{exp.role}</span>
@@ -25,8 +25,8 @@ export default function ExperienceSection() {
 
             {exp.projects && exp.projects.length > 0 && (
               <div className={styles.projects}>
-                {exp.projects.map((proj, j) => (
-                  <div key={j} className={styles.project}>
+                {exp.projects.map((proj) => (
+                  <div key={proj.title} className={styles.project}>
                     <div className={styles.projectHeader}>
                       <span className={styles.projectTitle}>{proj.title}</span>
                       <span className={styles.projectPeriod}>
@@ -38,8 +38,8 @@ export default function ExperienceSection() {
                       <span>{proj.teamSize}</span>
                     </div>
                     <ul className={styles.achievements}>
-                      {proj.achievements.map((a, k) => (
-                        <li key={k}>{a}</li>
+                      {proj.achievements.map((a) => (
+                        <li key={a}>{a}</li>
                       ))}
                     </ul>
                     <div className={styles.techs}>

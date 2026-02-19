@@ -10,6 +10,10 @@
   --accent: #00ff41;
   --accent-dim: #00cc33;
 
+  /* RGB channels for alpha compositing */
+  --bg-rgb: 10, 10, 10;
+  --border-rgb: 42, 42, 42;
+
   /* Typography */
   --font-mono: 'JetBrains Mono', monospace;
 

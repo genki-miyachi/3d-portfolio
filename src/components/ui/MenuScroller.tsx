@@ -3,6 +3,7 @@ import styles from './MenuScroller.module.css';
 
 const items = ['About', 'Skills', 'Experience', 'Contact'];
 const ITEM_COUNT = items.length;
+const tripled = [...items, ...items, ...items];
 const FRICTION = 0.93;
 const SNAP_THRESHOLD = 0.4;
 const SNAP_LERP = 0.12;
@@ -25,8 +26,6 @@ export default function MenuScroller({
   const centerIndexRef = useRef(-1);
   const activeSectionRef = useRef(activeSection);
   activeSectionRef.current = activeSection;
-
-  const tripled = [...items, ...items, ...items];
 
   useEffect(() => {
     const el = containerRef.current;
