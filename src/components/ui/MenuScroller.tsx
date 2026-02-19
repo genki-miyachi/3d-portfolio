@@ -178,15 +178,23 @@ export default function MenuScroller({
       rafId = requestAnimationFrame(update);
     };
 
-    // 矢印キーで1アイテムずつ移動
+    // 矢印キー / vim キーで1アイテムずつ移動
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+      if (
+        e.key === 'ArrowDown' ||
+        e.key === 'ArrowRight' ||
+        e.key === 'j'
+      ) {
         e.preventDefault();
         scrollToRef.current = centerIndexRef.current + 1;
-      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+      } else if (
+        e.key === 'ArrowUp' ||
+        e.key === 'ArrowLeft' ||
+        e.key === 'k'
+      ) {
         e.preventDefault();
         scrollToRef.current = centerIndexRef.current - 1;
-      } else if (e.key === 'Enter') {
+      } else if (e.key === 'Enter' || e.key === 'l') {
         const idx = centerIndexRef.current;
         if (idx >= 0) {
           const sectionIndex = (idx % ITEM_COUNT) + 1;

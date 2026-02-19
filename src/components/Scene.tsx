@@ -48,7 +48,7 @@ export default function Scene() {
   // Escape キーで閉じる
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setActiveSection(null);
+      if (e.key === 'Escape' || e.key === 'h') setActiveSection(null);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -109,7 +109,7 @@ export default function Scene() {
 
       {/* Modal overlay */}
       {sectionComponents.map((component, i) => {
-        if (i === 0 || !component) return null;
+        if (!component) return null;
         const isActive = activeSection === i;
         return (
           <div
