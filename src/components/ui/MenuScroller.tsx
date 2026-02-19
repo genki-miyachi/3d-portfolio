@@ -213,7 +213,7 @@ export default function MenuScroller({
       window.removeEventListener('touchend', onTouchEnd);
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [onHover, tripled.length]);
+  }, [onHover, onSelect]);
 
   const handleClick = useCallback(
     (i: number) => {

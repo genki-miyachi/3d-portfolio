@@ -34,7 +34,7 @@ export default function HeroSection({ onTypingDone }: HeroSectionProps) {
       setPhase("done");
       onTypingDone?.();
     }
-  }, [phase, nameLen, subLen]);
+  }, [phase, nameLen, subLen, onTypingDone]);
 
   const showCursorOnName = phase === "name";
   const showCursorOnSub = phase === "sub" || phase === "pause";

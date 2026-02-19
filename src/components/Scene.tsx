@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { PerformanceMonitor } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
@@ -11,6 +11,7 @@ import SkillsSection from './sections/SkillsSection';
 import ExperienceSection from './sections/ExperienceSection';
 import ContactSection from './sections/ContactSection';
 import MenuScroller from './ui/MenuScroller';
+import styles from './Scene.module.css';
 
 const sectionComponents = [
   null, // 0 = Hero (not in modal)
@@ -19,67 +20,6 @@ const sectionComponents = [
   <ExperienceSection key="experience" />,
   <ContactSection key="contact" />,
 ];
-
-const heroStyle: React.CSSProperties = {
-  position: 'fixed',
-  left: 0,
-  top: 0,
-  bottom: 0,
-  width: '60vw',
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  padding: '0 6vw',
-  zIndex: 10,
-  pointerEvents: 'none',
-  fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
-  transition: 'opacity 0.4s ease',
-};
-
-const overlayStyle: React.CSSProperties = {
-  position: 'fixed',
-  inset: 0,
-  zIndex: 30,
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  padding: '0.75rem',
-  transition: 'opacity 0.4s ease',
-};
-
-const cardStyle: React.CSSProperties = {
-  background: 'rgba(10, 10, 10, 0.8)',
-  backdropFilter: 'blur(16px)',
-  WebkitBackdropFilter: 'blur(16px)',
-  border: '1px solid rgba(42, 42, 42, 0.6)',
-  borderRadius: '8px',
-  padding: '2rem',
-  width: 'min(640px, calc(100vw - 1.5rem))',
-  maxHeight: 'calc(100vh - 1.5rem)',
-  overflowY: 'auto',
-  position: 'relative',
-  fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
-  transition: 'transform 0.4s ease',
-};
-
-const closeButtonStyle: React.CSSProperties = {
-  position: 'absolute',
-  top: '1rem',
-  right: '1rem',
-  background: 'none',
-  border: '1px solid var(--border)',
-  borderRadius: '4px',
-  color: 'var(--text-secondary)',
-  fontSize: '1rem',
-  width: '2rem',
-  height: '2rem',
-  cursor: 'pointer',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontFamily: 'var(--font-mono)',
-  transition: 'color 0.2s, border-color 0.2s',
-};
 
 export default function Scene() {
   // hoveredSection: メニュースクローラーの中央アイテム（3Dシーン連動）
@@ -117,7 +57,7 @@ export default function Scene() {
   return (
     <>
       {/* 3D Canvas */}
-      <div style={{ position: 'fixed', inset: 0, zIndex: 0 }}>
+      <div className={styles.canvasWrapper}>
         <Canvas
           dpr={[1, 2]}
           gl={{ antialias: true, alpha: false }}
@@ -144,7 +84,10 @@ export default function Scene() {
       </div>
 
       {/* Hero — 左側に常時表示 */}
-      <div style={{ ...heroStyle, opacity: activeSection === null ? 1 : 0.15 }}>
+      <div
+        className={styles.hero}
+        style={{ opacity: activeSection === null ? 1 : 0.15 }}
+      >
         <HeroSection onTypingDone={handleTypingDone} />
       </div>
 
@@ -171,31 +114,23 @@ export default function Scene() {
         return (
           <div
             key={i}
+            className={styles.overlay}
             style={{
-              ...overlayStyle,
               opacity: isActive ? 1 : 0,
               pointerEvents: isActive ? 'auto' : 'none',
             }}
             onClick={handleClose}
           >
             <div
+              className={styles.card}
               style={{
-                ...cardStyle,
                 transform: isActive ? 'translateY(0)' : 'translateY(20px)',
               }}
               onClick={(e) => e.stopPropagation()}
             >
               <button
-                style={closeButtonStyle}
+                className={styles.closeButton}
                 onClick={handleClose}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = 'var(--accent)';
-                  e.currentTarget.style.borderColor = 'var(--accent)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = 'var(--text-secondary)';
-                  e.currentTarget.style.borderColor = 'var(--border)';
-                }}
                 aria-label="Close"
               >
                 ×

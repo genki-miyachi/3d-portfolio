@@ -351,7 +351,10 @@ export default function ParticleField({ activeSection }: ParticleFieldProps) {
     materialRef.current.uniforms.uRippleCount.value = activeCount;
   });
 
-  const fullVertexShader = noiseGlsl + '\n' + vertexShader;
+  const fullVertexShader = useMemo(
+    () => noiseGlsl + '\n' + vertexShader,
+    [],
+  );
 
   return (
     <points frustumCulled={false}>

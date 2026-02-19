@@ -20,6 +20,7 @@ export default function CameraRig({ activeSection }: CameraRigProps) {
   const { camera, size } = useThree();
   const lookAtTarget = useRef(new THREE.Vector3());
   const targetPos = useRef(new THREE.Vector3());
+  const tempVec3 = useRef(new THREE.Vector3());
   const orbitAngle = useRef(0);
   const smoothPointer = useRef(new THREE.Vector2());
 
@@ -54,10 +55,8 @@ export default function CameraRig({ activeSection }: CameraRigProps) {
     camera.position.lerp(targetPos.current, lerpFactor);
 
     // lookAt もマウスで揺らす（カメラの向きも追従）
-    lookAtTarget.current.lerp(
-      new THREE.Vector3(px * -3, py * -2, 0),
-      lerpFactor,
-    );
+    tempVec3.current.set(px * -3, py * -2, 0);
+    lookAtTarget.current.lerp(tempVec3.current, lerpFactor);
     camera.lookAt(lookAtTarget.current);
   });
 
