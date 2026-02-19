@@ -211,6 +211,8 @@ function getParticleCount(): number {
   return window.innerWidth < 768 ? 2000 : 6000;
 }
 
+const PROJ_DIST = 12; // 3 * half (size=8, half=4)
+
 interface ParticleFieldProps {
   activeSection: number;
 }
@@ -229,8 +231,6 @@ export default function ParticleField({ activeSection }: ParticleFieldProps) {
     const cell16 = make16Cell();
     const cell24 = make24Cell();
     const cell600 = make600Cell();
-
-    const PROJ_DIST = 12; // 3 * half (size=8, half=4)
 
     const t0 = samplePolytope4D(count, 8, cell5); // Hero: 正五胞体
     const t1 = samplePolytope4D(count, 8, cell8); // About: 正八胞体
@@ -268,13 +268,12 @@ export default function ParticleField({ activeSection }: ParticleFieldProps) {
     Array.from({ length: MAX_RIPPLES }, () => new THREE.Vector3()),
   );
   const rippleTimes = useRef(new Float32Array(MAX_RIPPLES).fill(-1));
-  const rippleCount = useRef(0);
 
   const uniforms = useMemo(
     () => ({
       uTime: { value: 0 },
       uMorphIndex: { value: 0 },
-      uProjectDist: { value: 12 },
+      uProjectDist: { value: PROJ_DIST },
       uRippleOrigins: { value: rippleOrigins.current },
       uRippleTimes: { value: rippleTimes.current },
       uRippleCount: { value: 0 },
@@ -317,7 +316,6 @@ export default function ParticleField({ activeSection }: ParticleFieldProps) {
 
       rippleOrigins.current[slot].copy(closestPoint.current);
       times[slot] = 0;
-      rippleCount.current = Math.min(rippleCount.current + 1, MAX_RIPPLES);
     },
     [camera, gl],
   );

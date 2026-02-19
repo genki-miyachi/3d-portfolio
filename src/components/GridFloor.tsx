@@ -11,16 +11,15 @@ export default function GridFloor() {
   const { camera } = useThree();
 
   const grid = useMemo(() => {
-    const step = GRID_STEP;
     const half = GRID_SIZE / 2;
     const points: number[] = [];
 
     for (let i = 0; i <= GRID_DIVISIONS; i++) {
-      const z = -half + i * step;
+      const z = -half + i * GRID_STEP;
       points.push(-half, 0, z, half, 0, z);
     }
     for (let i = 0; i <= GRID_DIVISIONS; i++) {
-      const x = -half + i * step;
+      const x = -half + i * GRID_STEP;
       points.push(x, 0, -half, x, 0, half);
     }
 

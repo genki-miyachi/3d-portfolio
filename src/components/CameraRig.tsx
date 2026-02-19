@@ -24,9 +24,9 @@ export default function CameraRig({ activeSection }: CameraRigProps) {
   const orbitAngle = useRef(0);
   const smoothPointer = useRef(new THREE.Vector2());
 
-  useFrame((_state, delta) => {
+  useFrame((state, delta) => {
     // マウスパララックス（pointer を滑らかに追従、低めの速度でぬるっと感）
-    const pointer = _state.pointer;
+    const { pointer } = state;
     smoothPointer.current.lerp(pointer, 1 - Math.exp(-2.5 * delta));
 
     // ゆっくり回転し続ける
