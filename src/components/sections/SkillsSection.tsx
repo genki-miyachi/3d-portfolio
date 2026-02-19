@@ -3,11 +3,11 @@ import type { Skill } from '../../data/portfolio';
 import SectionTitle from '../ui/SectionTitle';
 import styles from './SkillsSection.module.css';
 
-const categories: { key: Skill['category']; label: string }[] = [
-  { key: 'frontend', label: 'Frontend' },
-  { key: 'backend', label: 'Backend' },
-  { key: 'infra', label: 'Infrastructure' },
-  { key: 'other', label: 'Other' },
+const categories: { key: Skill['category']; label: string; color: string }[] = [
+  { key: 'frontend', color: '#00ff41', label: 'Frontend' },
+  { key: 'backend', color: '#41b0ff', label: 'Backend' },
+  { key: 'infra', color: '#ff6b41', label: 'Infrastructure' },
+  { key: 'other', color: '#c084fc', label: 'Other' },
 ];
 
 export default function SkillsSection() {
@@ -23,7 +23,11 @@ export default function SkillsSection() {
       <SectionTitle number="02" title="SKILLS" />
       <div className={styles.grid}>
         {grouped.map((cat) => (
-          <div key={cat.key} className={styles.category}>
+          <div
+            key={cat.key}
+            className={styles.category}
+            style={{ '--cat-color': cat.color } as React.CSSProperties}
+          >
             <div className={styles.categoryHeader}>{cat.label}</div>
             {cat.items.map((skill) => (
               <div key={skill.name} className={styles.skillItem}>
