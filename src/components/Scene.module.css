@@ -69,3 +69,8 @@
   color: var(--accent);
   border-color: var(--accent);
 }
+
+.closeButton:focus-visible {
+  color: var(--accent);
+  border-color: var(--accent);
+}

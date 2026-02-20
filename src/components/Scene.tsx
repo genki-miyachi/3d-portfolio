@@ -15,10 +15,10 @@ import styles from './Scene.module.css';
 
 const sectionComponents = [
   null, // 0 = Hero (not in modal)
-  <AboutSection key="about" />,
-  <SkillsSection key="skills" />,
-  <ExperienceSection key="experience" />,
-  <ContactSection key="contact" />,
+  { component: <AboutSection key="about" />, labelledBy: 'section-about-title' },
+  { component: <SkillsSection key="skills" />, labelledBy: 'section-skills-title' },
+  { component: <ExperienceSection key="experience" />, labelledBy: 'section-experience-title' },
+  { component: <ContactSection key="contact" />, labelledBy: 'section-contact-title' },
 ];
 
 export default function Scene() {
@@ -57,7 +57,7 @@ export default function Scene() {
   return (
     <>
       {/* 3D Canvas */}
-      <div className={styles.canvasWrapper}>
+      <div className={styles.canvasWrapper} role="img" aria-label="4次元多胞体のインタラクティブパーティクルアニメーション">
         <Canvas
           dpr={[1, 2]}
           gl={{ antialias: true, alpha: false }}
@@ -108,8 +108,8 @@ export default function Scene() {
       )}
 
       {/* Modal overlay */}
-      {sectionComponents.map((component, i) => {
-        if (!component) return null;
+      {sectionComponents.map((entry, i) => {
+        if (!entry) return null;
         const isActive = activeSection === i;
         return (
           <div
@@ -119,6 +119,7 @@ export default function Scene() {
               opacity: isActive ? 1 : 0,
               pointerEvents: isActive ? 'auto' : 'none',
             }}
+            aria-hidden={!isActive}
             onClick={handleClose}
           >
             <div
@@ -126,16 +127,19 @@ export default function Scene() {
               style={{
                 transform: isActive ? 'translateY(0)' : 'translateY(20px)',
               }}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={entry.labelledBy}
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 className={styles.closeButton}
                 onClick={handleClose}
-                aria-label="Close"
+                aria-label="閉じる"
               >
                 ×
               </button>
-              {component}
+              {entry.component}
             </div>
           </div>
         );

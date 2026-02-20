@@ -5,7 +5,7 @@ import styles from './ExperienceSection.module.css';
 export default function ExperienceSection() {
   return (
     <section className={styles.section}>
-      <SectionTitle number="03" title="EXPERIENCE" />
+      <SectionTitle number="03" title="EXPERIENCE" id="section-experience-title" />
       <div className={styles.timeline}>
         {experiences.map((exp) => (
           <div key={`${exp.company}-${exp.period}`} className={styles.item}>

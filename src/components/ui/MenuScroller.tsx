@@ -235,7 +235,7 @@ export default function MenuScroller({
   );
 
   return (
-    <div ref={containerRef} className={styles.root}>
+    <div ref={containerRef} className={styles.root} role="navigation" aria-label="セクションメニュー">
       {tripled.map((label, i) => (
         <button
           key={i}

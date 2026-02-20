@@ -67,6 +67,10 @@
   color: var(--accent);
 }
 
+.item:focus-visible .label {
+  color: var(--accent);
+}
+
 .active .label {
   color: var(--accent);
   text-shadow: var(--accent-glow);

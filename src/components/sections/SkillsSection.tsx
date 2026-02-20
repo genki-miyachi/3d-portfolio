@@ -20,7 +20,7 @@ export default function SkillsSection() {
 
   return (
     <section className={styles.section}>
-      <SectionTitle number="02" title="SKILLS" />
+      <SectionTitle number="02" title="SKILLS" id="section-skills-title" />
       <div className={styles.grid}>
         {grouped.map((cat) => (
           <div
@@ -35,7 +35,14 @@ export default function SkillsSection() {
                   <span className={styles.skillName}>{skill.name}</span>
                   <span className={styles.skillLevel}>{skill.level}%</span>
                 </div>
-                <div className={styles.barTrack}>
+                <div
+                  className={styles.barTrack}
+                  role="progressbar"
+                  aria-label={skill.name}
+                  aria-valuenow={skill.level}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                >
                   <div
                     className={styles.barFill}
                     style={{ width: `${skill.level}%` }}

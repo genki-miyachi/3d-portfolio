@@ -5,7 +5,7 @@ import styles from './ContactSection.module.css';
 export default function ContactSection() {
   return (
     <section className={styles.section}>
-      <SectionTitle number="04" title="CONTACT" />
+      <SectionTitle number="04" title="CONTACT" id="section-contact-title" />
       <div className={styles.list}>
         {contactLinks.map((c) => (
           <div key={c.label} className={styles.item}>
@@ -15,6 +15,7 @@ export default function ContactSection() {
               className={styles.link}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={`${c.text} (新しいタブで開く)`}
             >
               {c.text}
             </a>

@@ -41,18 +41,18 @@ export default function HeroSection({ onTypingDone }: HeroSectionProps) {
 
   return (
     <section className={styles.section}>
-      <h1 className={styles.name}>
+      <h1 className={styles.name} aria-label={hero.name}>
         {hero.name.slice(0, nameLen)}
-        {showCursorOnName && <span className={styles.cursor}>|</span>}
+        {showCursorOnName && <span className={styles.cursor} aria-hidden="true">|</span>}
       </h1>
-      <p className={styles.subtitle}>
+      <p className={styles.subtitle} aria-label={hero.subtitle}>
         {phase !== "name" && (
           <>
             <span className={styles.accent}>
               {hero.subtitle.slice(0, 1)}
             </span>
             {hero.subtitle.slice(1, subLen)}
-            {showCursorOnSub && <span className={styles.cursor}>|</span>}
+            {showCursorOnSub && <span className={styles.cursor} aria-hidden="true">|</span>}
           </>
         )}
       </p>
