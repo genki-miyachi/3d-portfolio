@@ -58,6 +58,18 @@
   height: 100%;
   background: var(--cat-color, var(--accent));
   border-radius: 2px;
+  transform-origin: left;
+  animation: fillBar 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes fillBar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
 
 @media (max-width: 768px) {

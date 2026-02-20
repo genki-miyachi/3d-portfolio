@@ -30,7 +30,7 @@ export default function SkillsSection() {
             style={{ '--cat-color': cat.color } as React.CSSProperties}
           >
             <div className={styles.categoryHeader}>{cat.label}</div>
-            {cat.items.map((skill) => (
+            {cat.items.map((skill, i) => (
               <div key={skill.name} className={styles.skillItem}>
                 <div className={styles.skillInfo}>
                   <span className={styles.skillName}>{skill.name}</span>
@@ -46,7 +46,10 @@ export default function SkillsSection() {
                 >
                   <div
                     className={styles.barFill}
-                    style={{ width: `${skill.level}%` }}
+                    style={{
+                      width: `${skill.level}%`,
+                      '--delay': `${i * 0.06}s`,
+                    } as React.CSSProperties}
                   />
                 </div>
               </div>

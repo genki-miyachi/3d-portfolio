@@ -142,7 +142,7 @@ export default function Scene() {
               >
                 ×
               </button>
-              {entry.component}
+              {isActive && entry.component}
             </div>
           </div>
         );
