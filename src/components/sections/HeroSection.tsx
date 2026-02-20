@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { hero } from "../../data/portfolio";
+import { usePortfolio } from "../../data/portfolio";
 import styles from "./HeroSection.module.css";
 
 const TYPE_SPEED = 70; // ms per char
@@ -10,6 +10,7 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ onTypingDone }: HeroSectionProps) {
+  const { hero } = usePortfolio();
   const [nameLen, setNameLen] = useState(0);
   const [subLen, setSubLen] = useState(0);
   const [phase, setPhase] = useState<"name" | "pause" | "sub" | "done">(
@@ -34,7 +35,7 @@ export default function HeroSection({ onTypingDone }: HeroSectionProps) {
       setPhase("done");
       onTypingDone?.();
     }
-  }, [phase, nameLen, subLen, onTypingDone]);
+  }, [phase, nameLen, subLen, onTypingDone, hero]);
 
   const showCursorOnName = phase === "name";
   const showCursorOnSub = phase === "sub" || phase === "pause";

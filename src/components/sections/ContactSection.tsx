@@ -1,8 +1,9 @@
-import { contactLinks } from '../../data/portfolio';
+import { usePortfolio } from '../../data/portfolio';
 import SectionTitle from '../ui/SectionTitle';
 import styles from './ContactSection.module.css';
 
 export default function ContactSection() {
+  const { contactLinks } = usePortfolio();
   return (
     <section className={styles.section}>
       <SectionTitle number="04" title="CONTACT" id="section-contact-title" />

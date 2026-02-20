@@ -1,8 +1,9 @@
-import { experiences } from '../../data/portfolio';
+import { usePortfolio } from '../../data/portfolio';
 import SectionTitle from '../ui/SectionTitle';
 import styles from './ExperienceSection.module.css';
 
 export default function ExperienceSection() {
+  const { experiences } = usePortfolio();
   return (
     <section className={styles.section}>
       <SectionTitle number="03" title="EXPERIENCE" id="section-experience-title" />

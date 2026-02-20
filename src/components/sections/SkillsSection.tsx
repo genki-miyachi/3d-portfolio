@@ -1,4 +1,4 @@
-import { skills } from '../../data/portfolio';
+import { usePortfolio } from '../../data/portfolio';
 import type { Skill } from '../../data/portfolio';
 import SectionTitle from '../ui/SectionTitle';
 import styles from './SkillsSection.module.css';
@@ -11,6 +11,7 @@ const categories: { key: Skill['category']; label: string; color: string }[] = [
 ];
 
 export default function SkillsSection() {
+  const { skills } = usePortfolio();
   const grouped = categories
     .map((cat) => ({
       ...cat,

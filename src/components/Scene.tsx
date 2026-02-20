@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { PerformanceMonitor } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
+import { LocaleProvider } from '../contexts/LocaleContext';
 import CameraRig from './CameraRig';
 import ParticleField from './ParticleField';
 import GridFloor from './GridFloor';
@@ -11,6 +12,7 @@ import SkillsSection from './sections/SkillsSection';
 import ExperienceSection from './sections/ExperienceSection';
 import ContactSection from './sections/ContactSection';
 import MenuScroller from './ui/MenuScroller';
+import LangToggle from './ui/LangToggle';
 import styles from './Scene.module.css';
 
 const sectionComponents = [
@@ -55,7 +57,8 @@ export default function Scene() {
   }, []);
 
   return (
-    <>
+    <LocaleProvider>
+      <LangToggle />
       {/* 3D Canvas */}
       <div className={styles.canvasWrapper} role="img" aria-label="4次元多胞体のインタラクティブパーティクルアニメーション">
         <Canvas
@@ -144,6 +147,6 @@ export default function Scene() {
           </div>
         );
       })}
-    </>
+    </LocaleProvider>
   );
 }

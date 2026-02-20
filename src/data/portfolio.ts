@@ -1,4 +1,6 @@
-import data from './portfolio.json';
+import jaData from './portfolio-ja.json';
+import enData from './portfolio-en.json';
+import { useLocale } from '../contexts/LocaleContext';
 
 export interface Skill {
   name: string;
@@ -40,8 +42,16 @@ export interface About {
   lines: string[];
 }
 
-export const hero: Hero = data.hero;
-export const about: About = data.about;
-export const skills: Skill[] = data.skills as Skill[];
-export const experiences: Experience[] = data.experiences;
-export const contactLinks: ContactLink[] = data.contact.links;
+const dataMap = { ja: jaData, en: enData } as const;
+
+export function usePortfolio() {
+  const { locale } = useLocale();
+  const data = dataMap[locale];
+  return {
+    hero: data.hero as Hero,
+    about: data.about as About,
+    skills: data.skills as Skill[],
+    experiences: data.experiences as Experience[],
+    contactLinks: data.contact.links as ContactLink[],
+  };
+}

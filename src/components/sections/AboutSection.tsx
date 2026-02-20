@@ -1,8 +1,9 @@
-import { about } from '../../data/portfolio';
+import { usePortfolio } from '../../data/portfolio';
 import SectionTitle from '../ui/SectionTitle';
 import styles from './AboutSection.module.css';
 
 export default function AboutSection() {
+  const { about } = usePortfolio();
   return (
     <section className={styles.section}>
       <SectionTitle number="01" title="ABOUT" id="section-about-title" />
