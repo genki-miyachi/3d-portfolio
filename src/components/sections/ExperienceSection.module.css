@@ -27,7 +27,7 @@
 .item::before {
   content: '';
   position: absolute;
-  left: -1.75rem;
+  left: calc(-1.5rem - 3px);
   top: 0.35rem;
   width: 6px;
   height: 6px;
