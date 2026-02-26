@@ -43,6 +43,26 @@ const ogImageUrl = new URL(ogImage, Astro.site);
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />
 
+    <!-- Preconnect: Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Genki Miyachi",
+        "jobTitle": "Full Stack Engineer",
+        "url": "https://miyachi-genki.com",
+        "sameAs": [
+          "https://github.com/genki-miyachi",
+          "https://x.com/genki_gen",
+          "https://www.linkedin.com/in/%E5%85%83%E6%B0%97-%E5%AE%AE%E5%9C%B0-05a1341b9/"
+        ]
+      }
+    </script>
+
     <title>{title}</title>
   </head>
   <body>
