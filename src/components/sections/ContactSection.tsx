@@ -23,8 +23,6 @@ export default function ContactSection() {
           </div>
         ))}
       </div>
-      <div className={styles.divider} />
-      <p className={styles.footer}>Built with Astro + React Three Fiber</p>
     </section>
   );
 }

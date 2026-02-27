@@ -1,0 +1,72 @@
+.root {
+  width: 100%;
+  background: #0d0d0d;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.titleBar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  background: #1a1a1a;
+  border-bottom: 1px solid var(--border);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.titleText {
+  margin-left: 0.5rem;
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+}
+
+.output {
+  padding: 1rem;
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  white-space: pre;
+  font-family: var(--font-mono);
+}
+
+.line {
+  min-height: 1.2em;
+}
+
+.catHeader {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.expert {
+  color: var(--text-primary);
+}
+
+.proficient {
+  color: var(--text-secondary);
+}
+
+.familiar {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+.cursor {
+  color: var(--accent);
+  animation: blink 0.6s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
