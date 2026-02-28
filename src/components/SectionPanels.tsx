@@ -27,8 +27,8 @@ export default function SectionPanels({
 }: SectionPanelsProps) {
   const meshRefs = useRef<(THREE.Mesh | null)[]>([]);
 
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime();
+  useFrame((state) => {
+    const t = state.clock.elapsedTime;
     meshRefs.current.forEach((mesh, i) => {
       if (!mesh) return;
       const mat = mesh.material as THREE.MeshBasicMaterial;

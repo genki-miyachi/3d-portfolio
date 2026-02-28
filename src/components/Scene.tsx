@@ -37,6 +37,16 @@ export default function Scene() {
   const closeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const sceneSection = activeSection ?? hoveredSection;
 
+  // モーダル・カメラ状態を一括リセット
+  const resetModal = useCallback(() => {
+    setActiveSection(null);
+    setCameraReady(false);
+    setModalVisible(false);
+    setModalClosing(false);
+    clearTimeout(modalTimerRef.current);
+    clearTimeout(closeTimerRef.current);
+  }, []);
+
   const handleHover = useCallback((index: number) => {
     setHoveredSection(index);
   }, []);
@@ -56,24 +66,13 @@ export default function Scene() {
 
   const handleClose = useCallback(() => {
     if (!modalVisible || modalClosing) {
-      // モーダルがまだ出ていない or 既に閉じ中 → 即閉じ
-      setActiveSection(null);
-      setCameraReady(false);
-      setModalVisible(false);
-      setModalClosing(false);
-      clearTimeout(modalTimerRef.current);
-      clearTimeout(closeTimerRef.current);
+      resetModal();
       return;
     }
     // 閉じアニメーション開始
     setModalClosing(true);
-    closeTimerRef.current = setTimeout(() => {
-      setActiveSection(null);
-      setCameraReady(false);
-      setModalVisible(false);
-      setModalClosing(false);
-    }, CLOSE_ANIM_MS);
-  }, [modalVisible, modalClosing]);
+    closeTimerRef.current = setTimeout(resetModal, CLOSE_ANIM_MS);
+  }, [modalVisible, modalClosing, resetModal]);
 
   const handleCameraReady = useCallback(() => {
     setCameraReady(true);
@@ -140,12 +139,7 @@ export default function Scene() {
 
       {/* 右側の無限スクロールメニュー */}
       {introDone && (
-        <div
-          style={{
-            visibility: activeSection === null ? 'visible' : 'hidden',
-            pointerEvents: activeSection === null ? 'auto' : 'none',
-          }}
-        >
+        <div className={activeSection === null ? styles.menu : styles.menuHidden}>
           <MenuScroller
             onHover={handleHover}
             onSelect={handleSelect}

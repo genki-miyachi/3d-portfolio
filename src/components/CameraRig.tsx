@@ -47,10 +47,13 @@ const TRANSITION_DURATION = 1.8; // 秒
 export default function CameraRig({ activeSection, sectionActive, onTransitionComplete }: CameraRigProps) {
   const { camera, size } = useThree();
   const lookAtTarget = useRef(new THREE.Vector3());
-  const targetPos = useRef(new THREE.Vector3());
-  const tempVec3 = useRef(new THREE.Vector3());
   const orbitAngle = useRef(0);
   const smoothPointer = useRef(new THREE.Vector2());
+  // useFrame 内のオブジェクト生成を避けるためキャッシュ
+  const _sectionPos = useRef(new THREE.Vector3());
+  const _sectionLookAt = useRef(new THREE.Vector3());
+  const _normalPos = useRef(new THREE.Vector3());
+  const _normalLookAt = useRef(new THREE.Vector3());
 
   // トランジション用 state
   const transitionProgress = useRef(0); // 0=通常, 1=セクション表示
@@ -98,28 +101,30 @@ export default function CameraRig({ activeSection, sectionActive, onTransitionCo
     const sCamPos = sectionCamPositions[activeSection] ?? sectionCamPositions[0];
     const sLookAt = sectionLookOffsets[activeSection] ?? sectionLookOffsets[0];
 
-    const sectionPos = new THREE.Vector3(...sCamPos);
+    const sectionPos = _sectionPos.current.set(...sCamPos);
     sectionPos.x += px * 1.5;
     sectionPos.y += py * 0.8;
 
-    const sectionLookAt = new THREE.Vector3(...sLookAt);
+    const sectionLookAt = _sectionLookAt.current.set(...sLookAt);
     sectionLookAt.x += px * -1;
     sectionLookAt.y += py * -0.5;
 
     // 通常カメラの目標
-    orbitAngle.current += delta * 0.06 * (sectionActive ? 0 : 1);
+    if (!sectionActive) {
+      orbitAngle.current += delta * 0.06;
+    }
     const pos = cameraPositions[activeSection] ?? cameraPositions[0];
-    const scale = THREE.MathUtils.lerp(
+    const mobileScale = THREE.MathUtils.lerp(
       1.8,
       1,
       THREE.MathUtils.clamp(size.width / 768, 0, 1),
     );
-    const normalPos = new THREE.Vector3(...pos).multiplyScalar(scale);
+    const normalPos = _normalPos.current.set(...pos).multiplyScalar(mobileScale);
     normalPos.applyAxisAngle(Y_AXIS, orbitAngle.current);
     normalPos.x += px * 8;
     normalPos.y += py * 5;
 
-    const normalLookAt = new THREE.Vector3(px * -3, py * -2, 0);
+    const normalLookAt = _normalLookAt.current.set(px * -3, py * -2, 0);
 
     if (transitionProgress.current < 1) {
       // トランジション中: from → to を easeInOutQuad で補間

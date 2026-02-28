@@ -20,6 +20,17 @@
   transition: opacity 0.4s ease;
 }
 
+/* メニューラッパー */
+.menu {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.menuHidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 /* セクションモーダル */
 .overlay {
   position: fixed;
@@ -35,7 +46,6 @@
   background: rgba(10, 10, 10, 0.88);
   border: 1px solid rgba(0, 255, 65, 0.2);
   border-radius: 8px;
-  transform-origin: center center;
   padding: 2rem;
   width: calc(100vw - 3rem);
   max-width: 960px;
@@ -141,12 +151,7 @@
   z-index: 10;
 }
 
-.closeButton:hover {
-  color: var(--accent, #00ff41);
-  border-color: var(--accent, #00ff41);
-}
-
-.closeButton:focus-visible {
+.closeButton:is(:hover, :focus-visible) {
   color: var(--accent, #00ff41);
   border-color: var(--accent, #00ff41);
 }

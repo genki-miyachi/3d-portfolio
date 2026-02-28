@@ -52,7 +52,7 @@ export default function GridFloor({ sectionActive = false }: GridFloorProps) {
     };
   }, [grid]);
 
-  useFrame(() => {
+  useFrame((_, delta) => {
     if (!ref.current) return;
     // グリッドをカメラのXZ位置にスナップして端を見せない
     ref.current.position.x =
@@ -60,9 +60,13 @@ export default function GridFloor({ sectionActive = false }: GridFloorProps) {
     ref.current.position.z =
       Math.round(camera.position.z / GRID_STEP) * GRID_STEP;
 
-    // セクション表示時にグリッドを明るく
+    // セクション表示時にグリッドを明るく（フレームレート非依存）
     const target = sectionActive ? OPACITY_ACTIVE : OPACITY_IDLE;
-    grid.material.opacity += (target - grid.material.opacity) * 0.08;
+    grid.material.opacity = THREE.MathUtils.lerp(
+      grid.material.opacity,
+      target,
+      1 - Math.exp(-5 * delta),
+    );
   });
 
   return (
