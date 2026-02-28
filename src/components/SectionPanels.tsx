@@ -27,7 +27,7 @@ export default function SectionPanels({
 }: SectionPanelsProps) {
   const meshRefs = useRef<(THREE.Mesh | null)[]>([]);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     const t = state.clock.elapsedTime;
     meshRefs.current.forEach((mesh, i) => {
       if (!mesh) return;
@@ -36,14 +36,17 @@ export default function SectionPanels({
       const isActive = activeSection === sectionIndex;
       const isClosing = isActive && cameraReady;
 
-      // scale: 閉じ中は高速で潰す + 完全消灯、それ以外は復帰
       const axis = slitAxis[i];
       if (isClosing) {
-        mesh.scale[axis] = THREE.MathUtils.lerp(mesh.scale[axis], 0, 0.3);
-        mat.opacity = THREE.MathUtils.lerp(mat.opacity, 0, 0.25);
+        // 高速で潰す + 完全消灯
+        const closeFactor = 1 - Math.exp(-12 * delta);
+        mesh.scale[axis] = THREE.MathUtils.lerp(mesh.scale[axis], 0, closeFactor);
+        mat.opacity = THREE.MathUtils.lerp(mat.opacity, 0, 1 - Math.exp(-10 * delta));
       } else {
-        mesh.scale.x = THREE.MathUtils.lerp(mesh.scale.x, 1, 0.12);
-        mesh.scale.y = THREE.MathUtils.lerp(mesh.scale.y, 1, 0.12);
+        // 復帰
+        const restoreFactor = 1 - Math.exp(-5 * delta);
+        mesh.scale.x = THREE.MathUtils.lerp(mesh.scale.x, 1, restoreFactor);
+        mesh.scale.y = THREE.MathUtils.lerp(mesh.scale.y, 1, restoreFactor);
         const baseOpacity = isActive ? 0.6 : 0.35;
         const pulseAmp = isActive ? 0.2 : 0.15;
         mat.opacity = baseOpacity + pulseAmp * Math.sin(t * 1.8 + i * 1.2);
