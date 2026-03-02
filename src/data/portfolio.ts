@@ -5,7 +5,7 @@ import { useLocale } from '../contexts/LocaleContext';
 export interface Skill {
   name: string;
   tier: 'expert' | 'proficient' | 'familiar';
-  category: 'frontend' | 'backend' | 'infra' | 'other';
+  category: 'frontend' | 'backend' | 'infra' | 'ai' | 'other';
 }
 
 export interface Project {

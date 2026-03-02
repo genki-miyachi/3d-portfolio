@@ -6,6 +6,7 @@ const CAT_COLORS: Record<string, string> = {
   frontend: '#00ff41',
   backend: '#41b0ff',
   infra: '#ff6b41',
+  ai: '#facc15',
   other: '#c084fc',
 };
 
@@ -13,6 +14,7 @@ const CAT_LABELS: Record<string, string> = {
   frontend: 'Frontend',
   backend: 'Backend',
   infra: 'Infrastructure',
+  ai: 'AI Agent',
   other: 'Other',
 };
 
@@ -22,7 +24,7 @@ const TIER_WIDTH: Record<Skill['tier'], number> = {
   familiar: 30,
 };
 
-const CATS = ['frontend', 'backend', 'infra', 'other'] as const;
+const CATS = ['frontend', 'backend', 'infra', 'ai', 'other'] as const;
 
 export default function SkillsGlitchBars() {
   const { skills } = usePortfolio();

@@ -7,6 +7,7 @@ const CAT_LABELS: Record<string, string> = {
   frontend: 'Frontend',
   backend: 'Backend',
   infra: 'Infrastructure',
+  ai: 'AI Agent',
   other: 'Other',
 };
 
@@ -24,7 +25,7 @@ const TIER_LABEL: Record<Skill['tier'], string> = {
 
 function buildLines(skills: Skill[]): string[] {
   const lines: string[] = ['$ skills --list --verbose', ''];
-  const cats = ['frontend', 'backend', 'infra', 'other'] as const;
+  const cats = ['frontend', 'backend', 'infra', 'ai', 'other'] as const;
 
   for (const cat of cats) {
     const items = skills.filter((s) => s.category === cat);
@@ -38,7 +39,7 @@ function buildLines(skills: Skill[]): string[] {
     }
     lines.push('');
   }
-  lines.push('✓ Done. 14 skills loaded.');
+  lines.push(`✓ Done. ${skills.length} skills loaded.`);
   return lines;
 }
 
