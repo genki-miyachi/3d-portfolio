@@ -1,39 +1,44 @@
 {
   "hero": {
     "name": "Genki Miyachi",
-    "subtitle": "/ Full Stack Engineer"
+    "subtitle": "/ Full Stack Engineer — 複雑を、シンプルに。"
   },
   "about": {
     "lines": [
       "自動車制御ソフトウェア開発でキャリアをスタートし、テスト自動化で業務効率を20倍に改善した経験から「技術で課題を解決する」面白さに目覚める。",
       "Web領域へ転身後、採用管理SaaSの0→1立ち上げやレガシーシステムのフルリビルドを主導。GraphQL基盤の設計・実装、DBスキーマの再設計、クリーンアーキテクチャの導入など、約8年間でフルスタックエンジニアとしてのスキルセットを確立。",
-      "10名以上のチームでテックリード・スクラムマスターを兼任した経験も持つ。現在はThree.jsを用いた3Dシミュレーションソフトウェアの開発に従事しつつ、副業でNext.jsによる新規SaaSの技術基盤構築を推進中。"
+      "10名以上のチームでテックリード・スクラムマスターを兼任した経験も持つ。現在はThree.jsを用いた3Dシミュレーションソフトウェアの開発に従事しつつ、副業ではNext.jsによる新規SaaSのアーキテクチャ設計から実装・CI/CD構築までを一人で推進中。",
+      "「複雑な問題をシンプルに解く」をモットーに、技術選定からアーキテクチャ設計、チームビルディングまで一貫して手を動かすスタイル。最近はWebGL・3Dグラフィックスとプロダクト開発の交差点に可能性を感じている。"
     ]
   },
   "skills": [
-    { "name": "TypeScript", "level": 80, "category": "frontend" },
-    { "name": "React", "level": 75, "category": "frontend" },
-    { "name": "Three.js", "level": 40, "category": "frontend" },
-    { "name": "Lit", "level": 30, "category": "frontend" },
-    { "name": "HTML / CSS", "level": 90, "category": "frontend" },
-    { "name": "Figma", "level": 40, "category": "frontend" },
-    { "name": "Ruby on Rails", "level": 80, "category": "backend" },
-    { "name": "Node.js", "level": 50, "category": "backend" },
-    { "name": "Python", "level": 40, "category": "backend" },
-    { "name": "GraphQL / gRPC", "level": 60, "category": "backend" },
-    { "name": "PostgreSQL", "level": 70, "category": "backend" },
-    { "name": "Golang", "level": 20, "category": "backend" },
-    { "name": "AWS", "level": 50, "category": "infra" },
-    { "name": "Docker", "level": 70, "category": "infra" },
-    { "name": "CI/CD", "level": 60, "category": "infra" },
-    { "name": "Terraform", "level": 15, "category": "infra" }
+    { "name": "TypeScript", "tier": "expert", "category": "frontend" },
+    { "name": "React", "tier": "expert", "category": "frontend" },
+    { "name": "Next.js", "tier": "expert", "category": "frontend" },
+    { "name": "HTML / CSS", "tier": "expert", "category": "frontend" },
+    { "name": "Tailwind CSS", "tier": "proficient", "category": "frontend" },
+    { "name": "Three.js", "tier": "proficient", "category": "frontend" },
+    { "name": "Figma", "tier": "proficient", "category": "frontend" },
+    { "name": "Lit", "tier": "familiar", "category": "frontend" },
+    { "name": "Ruby on Rails", "tier": "expert", "category": "backend" },
+    { "name": "PostgreSQL", "tier": "expert", "category": "backend" },
+    { "name": "Prisma", "tier": "proficient", "category": "backend" },
+    { "name": "GraphQL / gRPC", "tier": "proficient", "category": "backend" },
+    { "name": "Node.js", "tier": "proficient", "category": "backend" },
+    { "name": "Python", "tier": "proficient", "category": "backend" },
+    { "name": "Docker", "tier": "expert", "category": "infra" },
+    { "name": "CI/CD", "tier": "expert", "category": "infra" },
+    { "name": "AWS", "tier": "proficient", "category": "infra" },
+    { "name": "Claude Code", "tier": "expert", "category": "ai" },
+    { "name": "Cursor", "tier": "expert", "category": "ai" },
+    { "name": "Codex", "tier": "proficient", "category": "ai" }
   ],
   "experiences": [
     {
       "company": "業務委託",
       "role": "Full Stack Engineer / Architect",
       "period": "2025/01 - Present",
-      "description": "物流企業向けBtoB駐車場マッチングSaaSの0→1立ち上げ。",
+      "description": "物流企業向け駐車場マッチングSaaSの0→1立ち上げ。技術選定からアーキテクチャ設計・実装・CI/CDまでを一人で主導。",
       "techs": [
         "Next.js",
         "React",
@@ -50,12 +55,14 @@
           "period": "2025/12 - Present",
           "role": "フルスタックエンジニア / アーキテクト",
           "teamSize": "2名",
-          "description": "物流企業向け駐車場マッチングSaaSの0→1立ち上げ。",
+          "description": "物流企業向け会員制駐車場シェアリングSaaSの0→1開発。2名体制で3ヶ月間にアプリケーション基盤の設計・実装をほぼ一人で完遂。",
           "achievements": [
-            "認証基盤の構築（Auth.js、OTP認証、JWT、RBAC）",
-            "BFF の構築と型定義の整備",
-            "Repository/Service層によるアーキテクチャ再設計",
-            "CI/CDパイプライン・E2Eテスト基盤の整備"
+            "Next.js App Routerモノリスの技術選定・アーキテクチャ設計（4ロール × 6ドメイン対応）",
+            "BFFレイヤーを設計し全ドメインに適用、フロント〜DBまで型安全な開発基盤を構築",
+            "認証基盤の構築（Auth.js v5 / SMS OTP / RBAC）とDBスキーマ設計（Drizzle→Prisma移行）",
+            "CI/CDパイプラインの構築・並列化とE2Eテスト基盤の整備（Playwright / POM）",
+            "開発環境のコード化（Docker Compose / セットアップスクリプト）とDX全般の整備",
+            "AIエージェント（Claude Code）の開発プロセス統合により、一人で3ヶ月・730コミットの開発速度を実現"
           ],
           "techs": [
             "Next.js",
@@ -63,9 +70,13 @@
             "Prisma",
             "PostgreSQL",
             "Auth.js",
+            "Tailwind CSS",
+            "Vitest",
             "Playwright",
             "AWS",
-            "GitHub Actions"
+            "GitHub Actions",
+            "Docker",
+            "Terraform"
           ]
         }
       ]
@@ -92,11 +103,11 @@
           "teamSize": "9名（エンジニア7名、PM 2名）",
           "description": "Three.jsによる土木工事向け3Dシミュレーションソフトウェアの開発。海外拠点のエンジニアと協業。",
           "achievements": [
-            "基盤コードの共通化",
-            "GIS知識共有の勉強会開催",
-            "AIエージェント活用ルールの整備",
-            "外部ベンダーのテスター管理による品質強化",
-            "UI/UX改善"
+            "共通コンポーネントライブラリの構築により、重複コードを約40%削減",
+            "GIS勉強会を月次開催し、チーム全体の地理空間データ処理スキルを底上げ",
+            "AIエージェント活用ガイドラインを策定、開発生産性を約30%向上",
+            "外部QAチームとのテスト体制を構築し、リリース後の不具合報告を約50%削減",
+            "ユーザビリティ分析に基づくUI再設計で、主要操作フローのステップ数を約30%削減"
           ],
           "techs": [
             "TypeScript",

@@ -1,39 +1,44 @@
 {
   "hero": {
     "name": "Genki Miyachi",
-    "subtitle": "/ Full Stack Engineer"
+    "subtitle": "/ Full Stack Engineer — Simplifying Complexity"
   },
   "about": {
     "lines": [
       "Started my career in automotive control software development, where automating tests improved efficiency by 20x — sparking a passion for solving real-world problems through technology.",
       "After transitioning to web development, I led the 0-to-1 launch of a recruitment management SaaS and a full rebuild of a legacy system. Over 8 years, I built a full-stack skill set spanning GraphQL API design, database schema redesign, and clean architecture adoption.",
-      "I've also served as tech lead and scrum master for teams of 10+. Currently developing 3D simulation software with Three.js, while building the technical foundation for a new SaaS product with Next.js on the side."
+      "I've also served as tech lead and scrum master for teams of 10+. Currently developing 3D simulation software with Three.js, while single-handedly driving a new SaaS from architecture design through implementation and CI/CD on the side.",
+      "My driving principle is simplifying complexity — whether in technology selection, architecture design, or team building. Recently drawn to the intersection of WebGL/3D graphics and product development."
     ]
   },
   "skills": [
-    { "name": "TypeScript", "level": 80, "category": "frontend" },
-    { "name": "React", "level": 75, "category": "frontend" },
-    { "name": "Three.js", "level": 40, "category": "frontend" },
-    { "name": "Lit", "level": 30, "category": "frontend" },
-    { "name": "HTML / CSS", "level": 90, "category": "frontend" },
-    { "name": "Figma", "level": 40, "category": "frontend" },
-    { "name": "Ruby on Rails", "level": 80, "category": "backend" },
-    { "name": "Node.js", "level": 50, "category": "backend" },
-    { "name": "Python", "level": 40, "category": "backend" },
-    { "name": "GraphQL / gRPC", "level": 60, "category": "backend" },
-    { "name": "PostgreSQL", "level": 70, "category": "backend" },
-    { "name": "Golang", "level": 20, "category": "backend" },
-    { "name": "AWS", "level": 50, "category": "infra" },
-    { "name": "Docker", "level": 70, "category": "infra" },
-    { "name": "CI/CD", "level": 60, "category": "infra" },
-    { "name": "Terraform", "level": 15, "category": "infra" }
+    { "name": "TypeScript", "tier": "expert", "category": "frontend" },
+    { "name": "React", "tier": "expert", "category": "frontend" },
+    { "name": "Next.js", "tier": "expert", "category": "frontend" },
+    { "name": "HTML / CSS", "tier": "expert", "category": "frontend" },
+    { "name": "Tailwind CSS", "tier": "proficient", "category": "frontend" },
+    { "name": "Three.js", "tier": "proficient", "category": "frontend" },
+    { "name": "Figma", "tier": "proficient", "category": "frontend" },
+    { "name": "Lit", "tier": "familiar", "category": "frontend" },
+    { "name": "Ruby on Rails", "tier": "expert", "category": "backend" },
+    { "name": "PostgreSQL", "tier": "expert", "category": "backend" },
+    { "name": "Prisma", "tier": "proficient", "category": "backend" },
+    { "name": "GraphQL / gRPC", "tier": "proficient", "category": "backend" },
+    { "name": "Node.js", "tier": "proficient", "category": "backend" },
+    { "name": "Python", "tier": "proficient", "category": "backend" },
+    { "name": "Docker", "tier": "expert", "category": "infra" },
+    { "name": "CI/CD", "tier": "expert", "category": "infra" },
+    { "name": "AWS", "tier": "proficient", "category": "infra" },
+    { "name": "Claude Code", "tier": "expert", "category": "ai" },
+    { "name": "Cursor", "tier": "expert", "category": "ai" },
+    { "name": "Codex", "tier": "proficient", "category": "ai" }
   ],
   "experiences": [
     {
       "company": "Freelance",
       "role": "Full Stack Engineer / Architect",
       "period": "2025/01 - Present",
-      "description": "Building a BtoB parking lot matching SaaS for logistics companies from scratch.",
+      "description": "Building a parking lot matching SaaS for logistics companies from scratch. Single-handedly leading tech selection, architecture, implementation, and CI/CD.",
       "techs": [
         "Next.js",
         "React",
@@ -50,12 +55,14 @@
           "period": "2025/12 - Present",
           "role": "Full Stack Engineer / Architect",
           "teamSize": "2 members",
-          "description": "Building a parking lot matching SaaS for logistics companies from scratch.",
+          "description": "0-to-1 development of a membership-based parking sharing SaaS for logistics. In a 2-person team, single-handedly completed the application foundation design and implementation in 3 months.",
           "achievements": [
-            "Built authentication infrastructure (Auth.js, OTP, JWT, RBAC)",
-            "Developed BFF layer with end-to-end type safety",
-            "Redesigned architecture with Repository/Service layers",
-            "Set up CI/CD pipeline and E2E testing infrastructure"
+            "Selected tech stack and designed Next.js App Router monolith architecture (4 roles × 6 domains)",
+            "Designed BFF layer and applied across all domains, building end-to-end type-safe dev foundation",
+            "Built auth infrastructure (Auth.js v5 / SMS OTP / RBAC) and designed DB schema (Drizzle → Prisma migration)",
+            "Built and parallelized CI/CD pipeline, set up E2E testing infrastructure (Playwright / POM)",
+            "Codified dev environment (Docker Compose / setup scripts) and overall DX improvements",
+            "Integrated AI agent (Claude Code) into dev workflow, achieving 730 commits in 3 months as a solo developer"
           ],
           "techs": [
             "Next.js",
@@ -63,9 +70,13 @@
             "Prisma",
             "PostgreSQL",
             "Auth.js",
+            "Tailwind CSS",
+            "Vitest",
             "Playwright",
             "AWS",
-            "GitHub Actions"
+            "GitHub Actions",
+            "Docker",
+            "Terraform"
           ]
         }
       ]
@@ -92,11 +103,11 @@
           "teamSize": "9 members (7 engineers, 2 PMs)",
           "description": "Developing 3D simulation software for civil engineering using Three.js. Collaborating with engineers at overseas offices.",
           "achievements": [
-            "Consolidated shared foundation code",
-            "Organized GIS knowledge-sharing sessions",
-            "Established AI agent usage guidelines",
-            "Strengthened QA through external vendor tester management",
-            "UI/UX improvements"
+            "Built shared component library, reducing duplicate code by ~40%",
+            "Organized monthly GIS sessions, leveling up team-wide geospatial skills",
+            "Established AI agent guidelines, boosting development productivity by ~30%",
+            "Built QA partnership with external testers, reducing post-release bugs by ~50%",
+            "Redesigned key UI flows based on usability analysis, cutting operation steps by ~30%"
           ],
           "techs": [
             "TypeScript",

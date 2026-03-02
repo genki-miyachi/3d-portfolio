@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { PerformanceMonitor } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
@@ -6,6 +6,7 @@ import { LocaleProvider } from '../contexts/LocaleContext';
 import CameraRig from './CameraRig';
 import ParticleField from './ParticleField';
 import GridFloor from './GridFloor';
+import SectionPanels from './SectionPanels';
 import HeroSection from './sections/HeroSection';
 import AboutSection from './sections/AboutSection';
 import SkillsSection from './sections/SkillsSection';
@@ -15,21 +16,41 @@ import MenuScroller from './ui/MenuScroller';
 import LangToggle from './ui/LangToggle';
 import styles from './Scene.module.css';
 
-const sectionComponents = [
-  null, // 0 = Hero (not in modal)
-  { component: <AboutSection key="about" />, labelledBy: 'section-about-title' },
-  { component: <SkillsSection key="skills" />, labelledBy: 'section-skills-title' },
-  { component: <ExperienceSection key="experience" />, labelledBy: 'section-experience-title' },
-  { component: <ContactSection key="contact" />, labelledBy: 'section-contact-title' },
+const CLOSE_ANIM_MS = 400;
+
+const sectionEntries = [
+  null, // 0 = Hero
+  { Component: AboutSection, label: 'section-about-title' },
+  { Component: SkillsSection, label: 'section-skills-title' },
+  { Component: ExperienceSection, label: 'section-experience-title' },
+  { Component: ContactSection, label: 'section-contact-title' },
 ];
 
 export default function Scene() {
-  // hoveredSection: メニュースクローラーの中央アイテム（3Dシーン連動）
-  // activeSection: モーダルで開いているセクション
   const [introDone, setIntroDone] = useState(false);
   const [hoveredSection, setHoveredSection] = useState(1);
   const [activeSection, setActiveSection] = useState<number | null>(null);
+  const [cameraReady, setCameraReady] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalClosing, setModalClosing] = useState(false);
+  const modalTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const sceneSection = activeSection ?? hoveredSection;
+
+  // モーダル・カメラ状態のクリーンアップ（activeSection は触らない）
+  const clearModalState = useCallback(() => {
+    setCameraReady(false);
+    setModalVisible(false);
+    setModalClosing(false);
+    clearTimeout(modalTimerRef.current);
+    clearTimeout(closeTimerRef.current);
+  }, []);
+
+  // モーダル・カメラ状態を一括リセット
+  const resetModal = useCallback(() => {
+    setActiveSection(null);
+    clearModalState();
+  }, [clearModalState]);
 
   const handleHover = useCallback((index: number) => {
     setHoveredSection(index);
@@ -37,24 +58,45 @@ export default function Scene() {
 
   const handleSelect = useCallback((index: number) => {
     setActiveSection((prev) => (prev === index ? null : index));
-  }, []);
+    clearModalState();
+  }, [clearModalState]);
 
   const handleTypingDone = useCallback(() => {
     setIntroDone(true);
   }, []);
 
   const handleClose = useCallback(() => {
-    setActiveSection(null);
+    if (!modalVisible || modalClosing) {
+      resetModal();
+      return;
+    }
+    // 閉じアニメーション開始
+    setModalClosing(true);
+    closeTimerRef.current = setTimeout(resetModal, CLOSE_ANIM_MS);
+  }, [modalVisible, modalClosing, resetModal]);
+
+  const handleCameraReady = useCallback(() => {
+    setCameraReady(true);
   }, []);
+
+  // cameraReady → 200ms 後にモーダル表示（グリッド消灯の猶予）
+  useEffect(() => {
+    if (cameraReady && activeSection !== null) {
+      modalTimerRef.current = setTimeout(() => setModalVisible(true), 200);
+    }
+    return () => clearTimeout(modalTimerRef.current);
+  }, [cameraReady, activeSection]);
 
   // Escape キーで閉じる
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' || e.key === 'h') setActiveSection(null);
+      if (e.key === 'Escape' || e.key === 'h') handleClose();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [handleClose]);
+
+  const entry = activeSection !== null ? sectionEntries[activeSection] : null;
 
   return (
     <LocaleProvider>
@@ -65,11 +107,13 @@ export default function Scene() {
           dpr={[1, 2]}
           gl={{ antialias: true, alpha: false }}
           camera={{ fov: 60, near: 0.1, far: 200 }}
+          onPointerMissed={handleClose}
         >
           <PerformanceMonitor>
-            <CameraRig activeSection={sceneSection} />
+            <CameraRig activeSection={sceneSection} sectionActive={activeSection !== null} onTransitionComplete={handleCameraReady} />
             {introDone && <ParticleField activeSection={sceneSection} />}
-            <GridFloor />
+            <GridFloor sectionActive={activeSection !== null} />
+            <SectionPanels activeSection={activeSection} cameraReady={cameraReady} />
           </PerformanceMonitor>
 
           <EffectComposer>
@@ -94,14 +138,9 @@ export default function Scene() {
         <HeroSection onTypingDone={handleTypingDone} />
       </div>
 
-      {/* 右側の無限スクロールメニュー（アンマウントせず隠してスクロール位置を保持） */}
+      {/* 右側の無限スクロールメニュー */}
       {introDone && (
-        <div
-          style={{
-            visibility: activeSection === null ? 'visible' : 'hidden',
-            pointerEvents: activeSection === null ? 'auto' : 'none',
-          }}
-        >
+        <div className={activeSection === null ? styles.menu : styles.menuHidden}>
           <MenuScroller
             onHover={handleHover}
             onSelect={handleSelect}
@@ -110,43 +149,27 @@ export default function Scene() {
         </div>
       )}
 
-      {/* Modal overlay */}
-      {sectionComponents.map((entry, i) => {
-        if (!entry) return null;
-        const isActive = activeSection === i;
-        return (
+      {/* セクションモーダル */}
+      {modalVisible && entry && (
+        <div className={styles.overlay} onClick={handleClose}>
           <div
-            key={i}
-            className={styles.overlay}
-            style={{
-              opacity: isActive ? 1 : 0,
-              pointerEvents: isActive ? 'auto' : 'none',
-            }}
-            aria-hidden={!isActive}
-            onClick={handleClose}
+            className={`${styles.card} ${modalClosing ? styles.cardClosing : ''}`}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={entry.label}
+            onClick={(e) => e.stopPropagation()}
           >
-            <div
-              className={styles.card}
-              style={{
-                transform: isActive ? 'translateY(0)' : 'translateY(20px)',
-              }}
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby={entry.labelledBy}
-              onClick={(e) => e.stopPropagation()}
+            <button
+              className={styles.closeButton}
+              onClick={handleClose}
+              aria-label="閉じる"
             >
-              <button
-                className={styles.closeButton}
-                onClick={handleClose}
-                aria-label="閉じる"
-              >
-                ×
-              </button>
-              {isActive && entry.component}
-            </div>
+              ×
+            </button>
+            <entry.Component />
           </div>
-        );
-      })}
+        </div>
+      )}
     </LocaleProvider>
   );
 }

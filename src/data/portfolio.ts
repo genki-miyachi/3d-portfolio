@@ -4,8 +4,8 @@ import { useLocale } from '../contexts/LocaleContext';
 
 export interface Skill {
   name: string;
-  level: number; // 0-100
-  category: 'frontend' | 'backend' | 'infra' | 'other';
+  tier: 'expert' | 'proficient' | 'familiar';
+  category: 'frontend' | 'backend' | 'infra' | 'ai' | 'other';
 }
 
 export interface Project {

@@ -6,7 +6,14 @@ const GRID_SIZE = 400;
 const GRID_DIVISIONS = 80;
 const GRID_STEP = GRID_SIZE / GRID_DIVISIONS;
 
-export default function GridFloor() {
+const OPACITY_IDLE = 0.06;
+const OPACITY_ACTIVE = 0.18;
+
+interface GridFloorProps {
+  sectionActive?: boolean;
+}
+
+export default function GridFloor({ sectionActive = false }: GridFloorProps) {
   const ref = useRef<THREE.LineSegments>(null);
   const { camera } = useThree();
 
@@ -31,7 +38,7 @@ export default function GridFloor() {
     const material = new THREE.LineBasicMaterial({
       color: '#00ff41', // --accent
       transparent: true,
-      opacity: 0.06,
+      opacity: OPACITY_IDLE,
       depthWrite: false,
       fog: true,
     });
@@ -45,13 +52,21 @@ export default function GridFloor() {
     };
   }, [grid]);
 
-  // グリッドをカメラのXZ位置にスナップ（グリッド間隔単位）して端を見せない
-  useFrame(() => {
+  useFrame((_, delta) => {
     if (!ref.current) return;
+    // グリッドをカメラのXZ位置にスナップして端を見せない
     ref.current.position.x =
       Math.round(camera.position.x / GRID_STEP) * GRID_STEP;
     ref.current.position.z =
       Math.round(camera.position.z / GRID_STEP) * GRID_STEP;
+
+    // セクション表示時にグリッドを明るく（フレームレート非依存）
+    const target = sectionActive ? OPACITY_ACTIVE : OPACITY_IDLE;
+    grid.material.opacity = THREE.MathUtils.lerp(
+      grid.material.opacity,
+      target,
+      1 - Math.exp(-5 * delta),
+    );
   });
 
   return (
