@@ -85,18 +85,34 @@ export default function SectionPanels({
 
       // 疑似ランダム周期でグリッチ窓を生成（セルごとにずらす）
       const cycle = (t * 0.7 + i * 5.3) % (4.5 + (i % 3) * 1.5);
-      const isGlitching = cycle < 0.11;
+      const isGlitching = cycle < 0.25;
 
       if (isGlitching) {
-        // 電気信号グリッチ: 水平スリットに潰れて明るくフラッシュ
-        mesh.scale.x = 1.3;
-        mesh.scale.y = 0.03;
-        mat.opacity = 0.6 + 0.3 * Math.sin(t * 80);
+        // 電気信号グリッチ: 8Hz で状態がバチッと切り替わる
+        const step = Math.floor(t * 8);
+        const hash = ((step * 13 + i * 7) * 2654435761) >>> 0;
+        const h0 = (hash & 0xff) / 255;
+        const h1 = ((hash >> 8) & 0xff) / 255;
+
+        // ステップ間にブラックアウトフレームを挟む
+        const subFrame = (t * 8) % 1;
+        const isBlank = subFrame < 0.15;
+
+        if (isBlank) {
+          mesh.scale.y = 0.001;
+          mat.opacity = 0;
+        } else {
+          mesh.scale.x = h0 < 0.33 ? 0.4 : h0 < 0.66 ? 0.7 : 1.0;
+          mesh.scale.y = 0.02;
+          mat.opacity = h1 < 0.3 ? 0 : 0.8;
+        }
       } else {
-        mat.opacity = base;
-        const restoreFactor = 1 - Math.exp(-10 * delta);
-        mesh.scale.x = THREE.MathUtils.lerp(mesh.scale.x, 1, restoreFactor);
-        mesh.scale.y = THREE.MathUtils.lerp(mesh.scale.y, 1, restoreFactor);
+        mesh.scale.x = 1;
+        mesh.scale.y = 1;
+        // 奇数セルは残光が少し残る、偶数セルは即復帰
+        mat.opacity = i % 2 === 1
+          ? THREE.MathUtils.lerp(mat.opacity, base, 1 - Math.exp(-6 * delta))
+          : base;
       }
     });
   });
