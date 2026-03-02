@@ -37,15 +37,20 @@ export default function Scene() {
   const closeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const sceneSection = activeSection ?? hoveredSection;
 
-  // モーダル・カメラ状態を一括リセット
-  const resetModal = useCallback(() => {
-    setActiveSection(null);
+  // モーダル・カメラ状態のクリーンアップ（activeSection は触らない）
+  const clearModalState = useCallback(() => {
     setCameraReady(false);
     setModalVisible(false);
     setModalClosing(false);
     clearTimeout(modalTimerRef.current);
     clearTimeout(closeTimerRef.current);
   }, []);
+
+  // モーダル・カメラ状態を一括リセット
+  const resetModal = useCallback(() => {
+    setActiveSection(null);
+    clearModalState();
+  }, [clearModalState]);
 
   const handleHover = useCallback((index: number) => {
     setHoveredSection(index);
@@ -53,12 +58,8 @@ export default function Scene() {
 
   const handleSelect = useCallback((index: number) => {
     setActiveSection((prev) => (prev === index ? null : index));
-    setCameraReady(false);
-    setModalVisible(false);
-    setModalClosing(false);
-    clearTimeout(modalTimerRef.current);
-    clearTimeout(closeTimerRef.current);
-  }, []);
+    clearModalState();
+  }, [clearModalState]);
 
   const handleTypingDone = useCallback(() => {
     setIntroDone(true);

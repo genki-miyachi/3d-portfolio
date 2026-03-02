@@ -43,8 +43,8 @@
 }
 
 .card {
-  background: rgba(10, 10, 10, 0.88);
-  border: 1px solid rgba(0, 255, 65, 0.2);
+  background: rgba(var(--bg-rgb), 0.88);
+  border: 1px solid rgba(var(--accent-rgb), 0.2);
   border-radius: 8px;
   padding: 2rem;
   width: calc(100vw - 3rem);
@@ -76,13 +76,13 @@
   0% {
     opacity: 0.9;
     transform: scaleX(0.4) scaleY(0.01);
-    border-color: rgba(0, 255, 65, 0.8);
-    box-shadow: 0 0 40px rgba(0, 255, 65, 0.5);
+    border-color: rgba(var(--accent-rgb), 0.8);
+    box-shadow: 0 0 40px rgba(var(--accent-rgb), 0.5);
   }
   25% {
     opacity: 1;
     transform: scaleX(0.85) scaleY(0.01);
-    box-shadow: 0 0 30px rgba(0, 255, 65, 0.4);
+    box-shadow: 0 0 30px rgba(var(--accent-rgb), 0.4);
   }
   55% {
     transform: scaleX(1.02) scaleY(1.08);
@@ -93,11 +93,11 @@
   100% {
     opacity: 1;
     transform: scaleX(1) scaleY(1);
-    border-color: rgba(0, 255, 65, 0.2);
+    border-color: rgba(var(--accent-rgb), 0.2);
     box-shadow:
-      0 0 20px rgba(0, 255, 65, 0.12),
-      0 0 60px rgba(0, 255, 65, 0.04),
-      inset 0 0 20px rgba(0, 255, 65, 0.02);
+      0 0 20px rgba(var(--accent-rgb), 0.12),
+      0 0 60px rgba(var(--accent-rgb), 0.04),
+      inset 0 0 20px rgba(var(--accent-rgb), 0.02);
   }
 }
 
@@ -110,10 +110,10 @@
   0% {
     opacity: 1;
     transform: scaleX(1) scaleY(1);
-    border-color: rgba(0, 255, 65, 0.2);
+    border-color: rgba(var(--accent-rgb), 0.2);
     box-shadow:
-      0 0 20px rgba(0, 255, 65, 0.12),
-      0 0 60px rgba(0, 255, 65, 0.04);
+      0 0 20px rgba(var(--accent-rgb), 0.12),
+      0 0 60px rgba(var(--accent-rgb), 0.04);
   }
   40% {
     transform: scaleX(1) scaleY(0.97);
@@ -121,13 +121,13 @@
   70% {
     opacity: 1;
     transform: scaleX(0.85) scaleY(0.01);
-    box-shadow: 0 0 30px rgba(0, 255, 65, 0.4);
+    box-shadow: 0 0 30px rgba(var(--accent-rgb), 0.4);
   }
   100% {
     opacity: 0;
     transform: scaleX(0.3) scaleY(0.01);
-    border-color: rgba(0, 255, 65, 0.8);
-    box-shadow: 0 0 40px rgba(0, 255, 65, 0.5);
+    border-color: rgba(var(--accent-rgb), 0.8);
+    box-shadow: 0 0 40px rgba(var(--accent-rgb), 0.5);
   }
 }
 
