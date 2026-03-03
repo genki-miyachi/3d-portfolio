@@ -110,7 +110,7 @@ export default function Scene() {
             <CameraRig activeSection={sceneSection} sectionActive={activeSection !== null} onTransitionComplete={handleCameraReady} />
             {introDone && <ParticleField activeSection={sceneSection} />}
             <GridFloor sectionActive={activeSection !== null} />
-            <SectionPanels activeSection={activeSection} cameraReady={cameraReady} onTypingComplete={handleSectionTypingComplete} />
+            <SectionPanels activeSection={activeSection} cameraReady={cameraReady} introDone={introDone} onTypingComplete={handleSectionTypingComplete} />
           </PerformanceMonitor>
 
           <EffectComposer>

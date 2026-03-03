@@ -251,6 +251,12 @@ const CHAR_INTERVAL = 0.08; // seconds per character
 const HOLD_DURATION = 0.3; // seconds after typing completes
 const PROMPT_LINE = 30; // Canvas 2D の行位置（visible window の下部）
 
+// ─── ブート演出定数 ───
+
+const BOOT_WAVE_SPEED = 1.2; // 対面(π)到達までの秒数
+const BOOT_CELL_DURATION = 0.3; // 各セルのスリットオープン秒数
+const BOOT_JITTER = 0.2; // ±0.1s のランダムばらつき
+
 const SECTION_HISTORY = [
   '$ ssh genki@portfolio',
   'Connected to portfolio.',
@@ -359,6 +365,14 @@ const sectionCells = sectionLookOffsets.slice(1).map(([x, , z]) => {
 });
 
 const SECTION_VIS = [0, 15, 30, 45];
+
+// セクションセルのブート遅延（角度距離ベース）
+const sectionBootDelays = SECTION_VIS.map((vi) => {
+  const angle = vi * GRID_ANGLE_STEP;
+  const angDist = Math.min(angle, 2 * Math.PI - angle) / Math.PI; // 0〜1
+  return angDist * BOOT_WAVE_SPEED;
+});
+
 const FILL_RATE = 0.18;
 const DECO_EXTEND = 10; // 上下に10行ずつ延長
 
@@ -417,12 +431,14 @@ const _scale = new THREE.Vector3();
 interface SectionPanelsProps {
   activeSection: number | null;
   cameraReady: boolean;
+  introDone: boolean;
   onTypingComplete?: () => void;
 }
 
 export default function SectionPanels({
   activeSection,
   cameraReady,
+  introDone,
   onTypingComplete,
 }: SectionPanelsProps) {
   const meshRefs = useRef<(THREE.Mesh | null)[]>([]);
@@ -431,6 +447,10 @@ export default function SectionPanels({
   const prevCameraReady = useRef(false);
   const lastBlinkState = useRef([false, false, false, false]);
   const wasTypingRef = useRef([false, false, false, false]);
+
+  // ブート演出用
+  const bootStartTime = useRef(0);
+  const prevIntroDone = useRef(false);
 
   const cellGeo = useMemo(
     () => createCurvedPanel(WALL_R, CELL_ARC, CELL_HEIGHT, 8),
@@ -460,7 +480,7 @@ export default function SectionPanels({
     });
   }, []);
 
-  // セクションセル用マテリアル（個別 uniform, スクロール無効）
+  // セクションセル用マテリアル（個別 uniform, スクロール無効, 初期非表示）
   const sectionMats = useMemo(
     () =>
       sectionCells.map((_, i) => {
@@ -470,7 +490,7 @@ export default function SectionPanels({
           uniforms: {
             uTime: { value: 0 },
             uSeed: { value: 0 },
-            uOpacity: { value: 0.4 },
+            uOpacity: { value: 0 },
             uTexture: { value: sectionCanvases[i].tex },
             uScrollSpeed: { value: 0 },
           },
@@ -493,11 +513,24 @@ export default function SectionPanels({
       const opacities = new Float32Array(count);
       cells.forEach((cell, i) => {
         seeds[i] = cellHash(cell.vi, cell.ri);
-        opacities[i] = 0.1;
+        opacities[i] = 0; // ブート前は非表示
       });
       const seedAttr = new THREE.InstancedBufferAttribute(seeds, 1);
       const opacityAttr = new THREE.InstancedBufferAttribute(opacities, 1);
       opacityAttr.setUsage(THREE.DynamicDrawUsage);
+
+      // per-instance boot delays (角度距離 + ジッター)
+      const bootDelays = new Float32Array(count);
+      cells.forEach((cell, i) => {
+        const angle = cell.vi * GRID_ANGLE_STEP;
+        const rawAngle =
+          ((angle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+        const angDist =
+          Math.min(rawAngle, 2 * Math.PI - rawAngle) / Math.PI;
+        bootDelays[i] =
+          angDist * BOOT_WAVE_SPEED +
+          (cellHash(cell.vi, cell.ri) - 0.5) * BOOT_JITTER;
+      });
 
       // geometry clone + instanced attrs
       const geo = cellGeo.clone();
@@ -524,18 +557,18 @@ export default function SectionPanels({
       mesh.frustumCulled = false;
       mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
 
-      // set initial instance transforms
+      // 初期: scale.y=0.001 で非表示
       cells.forEach((cell, i) => {
         _pos.set(...cell.position);
         _quat.setFromEuler(_euler.set(...cell.rotation));
-        _scale.set(1, 1, 1);
+        _scale.set(1, 0.001, 1);
         _mat4.compose(_pos, _quat, _scale);
         mesh.setMatrixAt(i, _mat4);
       });
       mesh.instanceMatrix.needsUpdate = true;
 
       const wasGlitching = new Uint8Array(count);
-      return { mesh, mat, opacityAttr, cells, wasGlitching };
+      return { mesh, mat, opacityAttr, cells, wasGlitching, bootDelays };
     });
   }, [cellGeo, textures]);
 
@@ -556,6 +589,17 @@ export default function SectionPanels({
   useFrame((state, delta) => {
     const t = state.clock.elapsedTime;
 
+    // ── introDone 立ち上がりエッジ検出（ブート開始） ──
+    if (introDone && !prevIntroDone.current) {
+      bootStartTime.current = t;
+    }
+    prevIntroDone.current = introDone;
+
+    const bootElapsed = t - bootStartTime.current;
+    const allBooted =
+      introDone &&
+      bootElapsed > BOOT_WAVE_SPEED + BOOT_CELL_DURATION + BOOT_JITTER;
+
     // ── cameraReady 立ち上がりエッジ検出 ──
     if (cameraReady && !prevCameraReady.current) {
       typingStartTime.current = t;
@@ -569,6 +613,34 @@ export default function SectionPanels({
       const mat = sectionMats[i];
       mat.uniforms.uTime.value = t;
 
+      // ── ブートゲート ──
+      const bootLocalT = introDone
+        ? Math.min(
+            Math.max(
+              (bootElapsed - sectionBootDelays[i]) / BOOT_CELL_DURATION,
+              0,
+            ),
+            1,
+          )
+        : 0;
+
+      if (bootLocalT <= 0) {
+        mesh.scale.y = 0.001;
+        mat.uniforms.uOpacity.value = 0;
+        return;
+      }
+
+      if (bootLocalT < 1) {
+        // スリットオープン演出
+        const eased = 1 - (1 - bootLocalT) ** 3; // easeOutCubic
+        mesh.scale.y = Math.max(eased, 0.001);
+        // ブート中は明るめフラッシュ → 通常に収束
+        mat.uniforms.uOpacity.value =
+          bootLocalT < 0.4 ? eased * 0.7 : THREE.MathUtils.lerp(0.7, 0.35, (bootLocalT - 0.4) / 0.6);
+        return;
+      }
+
+      // ── ブート完了後: 既存のタイピング / idle ロジック ──
       const sectionIndex = i + 1;
       const isActive = activeSection === sectionIndex;
       const name = SECTION_NAMES[i];
@@ -647,70 +719,125 @@ export default function SectionPanels({
     });
 
     // ── デコセル（InstancedMesh バッチ） ──
-    decoData.forEach(({ mesh, mat, opacityAttr, cells, wasGlitching }) => {
-      mat.uniforms.uTime.value = t;
-      let matrixDirty = false;
+    decoData.forEach(
+      ({ mesh, mat, opacityAttr, cells, wasGlitching, bootDelays }) => {
+        mat.uniforms.uTime.value = t;
+        let matrixDirty = false;
 
-      cells.forEach((cell, i) => {
-        const base = 0.1 + 0.06 * Math.sin(t * 1.0 + i * 2.3);
-        const cycle = (t * 0.7 + i * 5.3) % (4.5 + (i % 3) * 1.5);
-        const isGlitching = cycle < 0.25;
+        cells.forEach((cell, i) => {
+          // ── ブートゲート ──
+          if (!allBooted) {
+            const bootLocalT = introDone
+              ? Math.min(
+                  Math.max(
+                    (bootElapsed - bootDelays[i]) / BOOT_CELL_DURATION,
+                    0,
+                  ),
+                  1,
+                )
+              : 0;
 
-        let opacity: number;
+            if (bootLocalT <= 0) {
+              opacityAttr.setX(i, 0);
+              return;
+            }
 
-        if (isGlitching) {
-          const step = Math.floor(t * 8);
-          const hash = ((step * 13 + i * 7) * 2654435761) >>> 0;
-          const h0 = (hash & 0xff) / 255;
-          const h1 = ((hash >> 8) & 0xff) / 255;
-          const subFrame = (t * 8) % 1;
+            if (bootLocalT < 1) {
+              const eased = 1 - (1 - bootLocalT) ** 3;
+              _pos.set(...cell.position);
+              _quat.setFromEuler(_euler.set(...cell.rotation));
+              _scale.set(1, Math.max(eased, 0.001), 1);
+              _mat4.compose(_pos, _quat, _scale);
+              mesh.setMatrixAt(i, _mat4);
+              matrixDirty = true;
+              // ブートフラッシュ: 一瞬明るく → 通常に
+              opacityAttr.setX(
+                i,
+                bootLocalT < 0.4
+                  ? eased * 0.5
+                  : THREE.MathUtils.lerp(
+                      0.5,
+                      0.1,
+                      (bootLocalT - 0.4) / 0.6,
+                    ),
+              );
+              return;
+            }
 
-          let sx: number;
-          let sy: number;
-          if (subFrame < 0.15) {
-            sy = 0.001;
-            sx = 1;
-            opacity = 0;
-          } else {
-            sx = h0 < 0.33 ? 0.4 : h0 < 0.66 ? 0.7 : 1.0;
-            sy = 0.02;
-            opacity = h1 < 0.3 ? 0 : 0.8;
+            // bootLocalT >= 1: ブート完了 → scale.y を1に復元
+            if (wasGlitching[i] !== 2) {
+              // 2 = "booted" フラグとして流用
+              _pos.set(...cell.position);
+              _quat.setFromEuler(_euler.set(...cell.rotation));
+              _scale.set(1, 1, 1);
+              _mat4.compose(_pos, _quat, _scale);
+              mesh.setMatrixAt(i, _mat4);
+              wasGlitching[i] = 2;
+              matrixDirty = true;
+            }
           }
 
-          _pos.set(...cell.position);
-          _quat.setFromEuler(_euler.set(...cell.rotation));
-          _scale.set(sx, sy, 1);
-          _mat4.compose(_pos, _quat, _scale);
-          mesh.setMatrixAt(i, _mat4);
-          wasGlitching[i] = 1;
-          matrixDirty = true;
-        } else {
-          // グリッチ終了時にスケールを復元
-          if (wasGlitching[i]) {
+          // ── 通常動作 ──
+          const base = 0.1 + 0.06 * Math.sin(t * 1.0 + i * 2.3);
+          const cycle = (t * 0.7 + i * 5.3) % (4.5 + (i % 3) * 1.5);
+          const isGlitching = cycle < 0.25;
+
+          let opacity: number;
+
+          if (isGlitching) {
+            const step = Math.floor(t * 8);
+            const hash = ((step * 13 + i * 7) * 2654435761) >>> 0;
+            const h0 = (hash & 0xff) / 255;
+            const h1 = ((hash >> 8) & 0xff) / 255;
+            const subFrame = (t * 8) % 1;
+
+            let sx: number;
+            let sy: number;
+            if (subFrame < 0.15) {
+              sy = 0.001;
+              sx = 1;
+              opacity = 0;
+            } else {
+              sx = h0 < 0.33 ? 0.4 : h0 < 0.66 ? 0.7 : 1.0;
+              sy = 0.02;
+              opacity = h1 < 0.3 ? 0 : 0.8;
+            }
+
             _pos.set(...cell.position);
             _quat.setFromEuler(_euler.set(...cell.rotation));
-            _scale.set(1, 1, 1);
+            _scale.set(sx, sy, 1);
             _mat4.compose(_pos, _quat, _scale);
             mesh.setMatrixAt(i, _mat4);
-            wasGlitching[i] = 0;
+            wasGlitching[i] = 1;
             matrixDirty = true;
+          } else {
+            // グリッチ終了時にスケールを復元
+            if (wasGlitching[i] === 1) {
+              _pos.set(...cell.position);
+              _quat.setFromEuler(_euler.set(...cell.rotation));
+              _scale.set(1, 1, 1);
+              _mat4.compose(_pos, _quat, _scale);
+              mesh.setMatrixAt(i, _mat4);
+              wasGlitching[i] = 0;
+              matrixDirty = true;
+            }
+
+            const curr = opacityAttr.getX(i);
+            opacity =
+              i % 2 === 1
+                ? THREE.MathUtils.lerp(curr, base, 1 - Math.exp(-6 * delta))
+                : base;
           }
 
-          const curr = opacityAttr.getX(i);
-          opacity =
-            i % 2 === 1
-              ? THREE.MathUtils.lerp(curr, base, 1 - Math.exp(-6 * delta))
-              : base;
+          opacityAttr.setX(i, opacity);
+        });
+
+        opacityAttr.needsUpdate = true;
+        if (matrixDirty) {
+          mesh.instanceMatrix.needsUpdate = true;
         }
-
-        opacityAttr.setX(i, opacity);
-      });
-
-      opacityAttr.needsUpdate = true;
-      if (matrixDirty) {
-        mesh.instanceMatrix.needsUpdate = true;
-      }
-    });
+      },
+    );
   });
 
   return (
@@ -725,6 +852,7 @@ export default function SectionPanels({
           material={sectionMats[i]}
           position={cell.position}
           rotation={cell.rotation}
+          scale={[1, 0.001, 1]}
         />
       ))}
       {decoData.map((d, i) => (
