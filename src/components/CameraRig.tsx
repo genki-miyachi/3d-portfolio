@@ -3,11 +3,11 @@ import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
 const cameraPositions: [number, number, number][] = [
-  [0, 4, 30], // Hero: 正面、引き気味で全体俯瞰
-  [18, -3, 22], // About: 大きく右、少し下
-  [-12, 8, 14], // Skills: 左上から接近
-  [20, 6, 10], // Experience: 右上、かなり近い
-  [0, -2, 12], // Contact: 正面、最も近い
+  [0, 4, 30],    // Hero: 正面、引き気味で全体俯瞰
+  [2, 3, -24],   // About: セル(+Z)の真正面
+  [-24, 5, 2],   // Skills: セル(+X)の真正面
+  [-2, 4, 24],   // Experience: セル(-Z)の真正面
+  [24, 3, -2],   // Contact: セル(-X)の真正面
 ];
 
 // セクション表示時: パーティクル(原点)を中心に 90° ずつ4方向に配置
@@ -79,6 +79,7 @@ export default function CameraRig({ activeSection, sectionActive, onTransitionCo
       fromLookAt.current.copy(lookAtTarget.current);
       transitionProgress.current = 0;
       firedComplete.current = false;
+      orbitAngle.current = 0;
     }
 
     // progress を 0→1 に進める

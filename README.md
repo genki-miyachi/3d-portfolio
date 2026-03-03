@@ -27,11 +27,13 @@ index.astro
        │   ├─ CameraRig          ← activeSection で lerp 遷移 + マウスパララックス
        │   ├─ ParticleField       ← 4D正多胞体 → GPU回転 → 3D投影 (custom shader)
        │   ├─ GridFloor           ← 無限グリッド (カメラ追従スナップ)
+       │   ├─ SectionPanels      ← セクション光セル + 装飾セル (電気信号グリッチ)
        │   └─ EffectComposer      ← Bloom
        └─ HTML Overlay (fixed)
             ├─ HeroSection        ← タイピングアニメーション
             ├─ MenuScroller       ← 無限スクロールホイール (物理演算 + スナップ)
-            └─ Modal sections     ← About / Skills / Experience / Contact
+            ├─ LangToggle         ← JA/EN 言語切り替え
+            └─ Modal sections     ← About / Skills / Experience / Contact (にゅんアニメーション)
 ```
 
 ### Key Design Decisions
@@ -113,18 +115,23 @@ npm run preview    # Preview build output
 src/
   components/
     Scene.tsx              # R3F Canvas root + modal overlay
-    CameraRig.tsx          # Scroll-linked camera with parallax
+    CameraRig.tsx          # Menu-driven camera with parallax
     ParticleField.tsx      # 4D polytope particle system
-    GridFloor.tsx          # Infinite grid floor
+    GridFloor.tsx          # Infinite grid floor (camera-tracking snap)
+    SectionPanels.tsx      # Section glow cells + deco cells (electric glitch)
     sections/              # About, Skills, Experience, Contact
-    ui/                    # MenuScroller, SectionTitle
+      skills/              # SkillsGlitchBars, SkillsTerminal
+    ui/                    # MenuScroller, SectionTitle, LangToggle
+  contexts/
+    LocaleContext.tsx       # i18n context (JA/EN)
   shaders/
     noise.glsl             # Simplex 3D noise (Stefan Gustavson)
     particles.vert         # 4D rotation + projection + ripple
     particles.frag         # Point sprite with soft glow
   data/
-    portfolio.json         # Content data
-    portfolio.ts           # Type definitions + exports
+    portfolio.ts           # Type definitions + usePortfolio hook
+    portfolio-ja.json      # Japanese content
+    portfolio-en.json      # English content
   styles/
     global.css             # CSS Custom Properties + reset
   layouts/
