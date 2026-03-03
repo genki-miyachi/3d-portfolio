@@ -10,9 +10,9 @@ const cameraPositions: [number, number, number][] = [
   [24, 3, -2],   // Contact: セル(-X)の真正面
 ];
 
-// セクション表示時: パーティクル(原点)を中心に 90° ずつ4方向に配置
-const DIST = 80;  // 原点からの距離
-const CAM_H = 30; // カメラ高さ（大きめパネルが収まるように）
+// セクション表示時: 原点寄りから壁面方向を見る
+const DIST = 55;  // 原点からの距離
+const CAM_H = 12; // カメラ高さ
 const sectionCamPositions: [number, number, number][] = [
   [0, 20, -40],           // 0: Hero (未使用)
   [0, CAM_H, DIST],       // 1: About — 前方 (0°)
@@ -20,13 +20,13 @@ const sectionCamPositions: [number, number, number][] = [
   [0, CAM_H, -DIST],      // 3: Experience — 後方 (180°)
   [-DIST, CAM_H, 0],      // 4: Contact — 左 (270°)
 ];
-const LOOK_DIST = 70; // lookAt の原点からの距離
+const LOOK_DIST = 120; // 壁面半径
 export const sectionLookOffsets: [number, number, number][] = [
-  [0, -12, 0],                // 0: Hero
-  [0, -12, LOOK_DIST],        // 1: About — 前方
-  [LOOK_DIST, -12, 0],        // 2: Skills — 右
-  [0, -12, -LOOK_DIST],       // 3: Experience — 後方
-  [-LOOK_DIST, -12, 0],       // 4: Contact — 左
+  [0, 0, 0],                  // 0: Hero
+  [0, 0, LOOK_DIST],          // 1: About — 前方
+  [LOOK_DIST, 0, 0],          // 2: Skills — 右
+  [0, 0, -LOOK_DIST],         // 3: Experience — 後方
+  [-LOOK_DIST, 0, 0],         // 4: Contact — 左
 ];
 
 const Y_AXIS = new THREE.Vector3(0, 1, 0);

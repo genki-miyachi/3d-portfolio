@@ -79,13 +79,10 @@ export default function Scene() {
     setCameraReady(true);
   }, []);
 
-  // cameraReady → 200ms 後にモーダル表示（グリッド消灯の猶予）
-  useEffect(() => {
-    if (cameraReady && activeSection !== null) {
-      modalTimerRef.current = setTimeout(() => setModalVisible(true), 200);
-    }
-    return () => clearTimeout(modalTimerRef.current);
-  }, [cameraReady, activeSection]);
+  // SectionPanels のタイピング完了 → 200ms 後にモーダル表示
+  const handleSectionTypingComplete = useCallback(() => {
+    modalTimerRef.current = setTimeout(() => setModalVisible(true), 200);
+  }, []);
 
   // Escape キーで閉じる
   useEffect(() => {
@@ -113,7 +110,7 @@ export default function Scene() {
             <CameraRig activeSection={sceneSection} sectionActive={activeSection !== null} onTransitionComplete={handleCameraReady} />
             {introDone && <ParticleField activeSection={sceneSection} />}
             <GridFloor sectionActive={activeSection !== null} />
-            <SectionPanels activeSection={activeSection} cameraReady={cameraReady} />
+            <SectionPanels activeSection={activeSection} cameraReady={cameraReady} onTypingComplete={handleSectionTypingComplete} />
           </PerformanceMonitor>
 
           <EffectComposer>
@@ -124,7 +121,7 @@ export default function Scene() {
             />
           </EffectComposer>
 
-          <fogExp2 attach="fog" args={['#0a0a0a', 0.018]} />
+          <fogExp2 attach="fog" args={['#0a0a0a', 0.008]} />
           <ambientLight intensity={0.5} />
           <color attach="background" args={['#0a0a0a']} />
         </Canvas>
