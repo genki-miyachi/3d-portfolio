@@ -6,9 +6,9 @@
   "about": {
     "lines": [
       "自動車制御ソフトウェア開発でキャリアをスタートし、テスト自動化で業務効率を20倍に改善した経験から「技術で課題を解決する」面白さに目覚める。",
-      "Web領域へ転身後、採用管理SaaSの0→1立ち上げやレガシーシステムのフルリビルドを主導。GraphQL基盤の設計・実装、DBスキーマの再設計、クリーンアーキテクチャの導入など、約8年間でフルスタックエンジニアとしてのスキルセットを確立。",
-      "10名以上のチームでテックリード・スクラムマスターを兼任した経験も持つ。現在はThree.jsを用いた3Dシミュレーションソフトウェアの開発に従事しつつ、副業ではNext.jsによる新規SaaSのアーキテクチャ設計から実装・CI/CD構築までを一人で推進中。",
-      "「複雑な問題をシンプルに解く」をモットーに、技術選定からアーキテクチャ設計、チームビルディングまで一貫して手を動かすスタイル。最近はWebGL・3Dグラフィックスとプロダクト開発の交差点に可能性を感じている。"
+      "Web領域へ転身後、採用管理SaaSの0→1立ち上げやレガシーシステムのフルリビルドを主導。GraphQL基盤の設計・実装、DBスキーマの再設計、クリーンアーキテクチャの導入など、約9年間でフルスタックエンジニアとしてのスキルセットを確立。",
+      "10名以上のチームでテックリード・スクラムマスターを兼任した経験も持つ。本業ではThree.js / CesiumJSによる土木向け3Dシミュレーション開発を経て、現在は生成AIチームの立ち上げメンバーとしてLLM・AIエージェントを軸としたプロダクト開発に従事。2026年6月にはCesium Developer Conference 2026に登壇し、CesiumJSによる水流予測機能の開発事例を発表した。",
+      "副業ではBtoB SaaSの0→1をテックリードとして推進し、アーキテクチャ設計から実装・インフラ・CI/CD構築までを一貫して担当。「複雑な問題をシンプルに解く」をモットーに、技術選定からチームビルディングまで自ら手を動かすスタイル。"
     ]
   },
   "skills": [
@@ -18,6 +18,7 @@
     { "name": "HTML / CSS", "tier": "expert", "category": "frontend" },
     { "name": "Tailwind CSS", "tier": "proficient", "category": "frontend" },
     { "name": "Three.js", "tier": "proficient", "category": "frontend" },
+    { "name": "CesiumJS", "tier": "proficient", "category": "frontend" },
     { "name": "Figma", "tier": "proficient", "category": "frontend" },
     { "name": "Lit", "tier": "familiar", "category": "frontend" },
     { "name": "Ruby on Rails", "tier": "expert", "category": "backend" },
@@ -29,51 +30,60 @@
     { "name": "Docker", "tier": "expert", "category": "infra" },
     { "name": "CI/CD", "tier": "expert", "category": "infra" },
     { "name": "AWS", "tier": "proficient", "category": "infra" },
+    { "name": "Terraform", "tier": "proficient", "category": "infra" },
     { "name": "Claude Code", "tier": "expert", "category": "ai" },
     { "name": "Cursor", "tier": "expert", "category": "ai" },
+    { "name": "Claude / OpenAI API", "tier": "proficient", "category": "ai" },
+    { "name": "MCP", "tier": "proficient", "category": "ai" },
     { "name": "Codex", "tier": "proficient", "category": "ai" }
   ],
   "experiences": [
     {
       "company": "業務委託",
-      "role": "Full Stack Engineer / Architect",
-      "period": "2025/01 - Present",
-      "description": "物流企業向け駐車場マッチングSaaSの0→1立ち上げ。技術選定からアーキテクチャ設計・実装・CI/CDまでを一人で主導。",
+      "role": "Full Stack Engineer / Tech Lead",
+      "period": "2025/12 - Present",
+      "description": "物流企業向けBtoB駐車場マッチングSaaSの新規事業立ち上げ。BFF構築からインフラまで一貫して担当し、全コミットの約7割を占めるコアエンジニアとして推進。",
       "techs": [
         "Next.js",
         "React",
         "TypeScript",
         "Prisma",
         "PostgreSQL",
+        "Redis",
         "Auth.js",
         "Playwright",
-        "AWS"
+        "AWS",
+        "Terraform"
       ],
       "projects": [
         {
-          "title": "BtoB 休憩用駐車場マッチングサービス",
+          "title": "BtoB 休憩用駐車場マッチングサービスの立ち上げ",
           "period": "2025/12 - Present",
-          "role": "フルスタックエンジニア / アーキテクト",
-          "teamSize": "2名",
-          "description": "物流企業向け会員制駐車場シェアリングSaaSの0→1開発。2名体制で3ヶ月間にアプリケーション基盤の設計・実装をほぼ一人で完遂。",
+          "role": "フルスタックエンジニア / テックリード",
+          "teamSize": "6名",
+          "description": "非エンジニアのVibe codingにより全画面がMockデータで動作していた状態からReviewerとして参画。バックエンド不在の状態から、BFF・認証基盤・インフラ・CI/CDまでを一貫して構築。",
           "achievements": [
-            "Next.js App Routerモノリスの技術選定・アーキテクチャ設計（4ロール × 6ドメイン対応）",
-            "BFFレイヤーを設計し全ドメインに適用、フロント〜DBまで型安全な開発基盤を構築",
-            "認証基盤の構築（Auth.js v5 / SMS OTP / RBAC）とDBスキーマ設計（Drizzle→Prisma移行）",
-            "CI/CDパイプラインの構築・並列化とE2Eテスト基盤の整備（Playwright / POM）",
-            "開発環境のコード化（Docker Compose / セットアップスクリプト）とDX全般の整備",
-            "AIエージェント（Claude Code）の開発プロセス統合により、一人で3ヶ月・730コミットの開発速度を実現"
+            "Component毎に散在したMockを一元化し、全画面を実データへ置き換え（企業・契約・駐車場・予約・車両・通知）",
+            "Route Handler → Service → Repository のクリーンアーキテクチャを導入し、ContractPlanベースへドメインモデルを再設計",
+            "createRoute() ミドルウェアで認可を単一関門へ集約し、全Route Handlerが必ず通過する設計に",
+            "認証基盤の構築（Auth.js v5 / SMS OTP / RBAC / アカウントロック / Redisレート制限 / タイミング攻撃対策）",
+            "GitHub Actions + ecspresso による ECS 自動デプロイと、Playwright + Docker Compose のE2Eテスト基盤を構築",
+            "AIエージェント（Claude Code）を開発プロセスへ統合し、全コミットの約7割を一人で担う開発速度を実現"
           ],
           "techs": [
             "Next.js",
             "TypeScript",
             "Prisma",
             "PostgreSQL",
+            "Redis",
             "Auth.js",
             "Tailwind CSS",
+            "TanStack Query",
+            "Zod",
             "Vitest",
             "Playwright",
             "AWS",
+            "ecspresso",
             "GitHub Actions",
             "Docker",
             "Terraform"
@@ -83,37 +93,72 @@
     },
     {
       "company": "EarthBrain Inc.",
-      "role": "Full Stack Engineer",
+      "role": "Full Stack Engineer → Generative AI Engineer",
       "period": "2024/06 - Present",
-      "description": "Three.jsによる土木工事向け3Dシミュレーションソフトウェアの開発。",
+      "description": "土木向け3Dシミュレーションソフトウェアの開発を経て、社内生成AIチームの立ち上げに参画。現在はLLM・AIエージェントを軸としたプロダクト開発を担当。",
       "techs": [
         "TypeScript",
         "React",
         "Lit",
         "Three.js",
+        "CesiumJS",
         "Node.js",
         "Python",
+        "Claude API",
         "AWS"
       ],
       "projects": [
         {
+          "title": "生成AI活用チームの立ち上げ / LLMプロダクト開発",
+          "period": "2026/04 - Present",
+          "role": "生成AIエンジニア（チーム立ち上げメンバー）",
+          "teamSize": "2〜3名",
+          "description": "建設DXプロダクト群への生成AI活用を推進する専任チームの立ち上げに参画。LLM機能の実装から社内AI活用の基盤整備までを少数チームで一貫して担当。",
+          "achievements": [
+            "LLM APIを活用したプロダクト機能を設計・実装し本番リリース",
+            "建設現場の安全管理AIのバックエンドをDDD・レイヤードアーキテクチャで設計・実装",
+            "MCPサーバー群を実装し、社内データ基盤をAIエージェントから横断利用できる形に整備",
+            "社内向けAI活用ルール・ガイドラインを策定し全社展開",
+            "PoC・技術検証を高速に回し、実用性を見極めた上で機能化の可否を判断するプロセスを確立"
+          ],
+          "techs": [
+            "Python",
+            "TypeScript",
+            "Node.js",
+            "Claude API",
+            "OpenAI API",
+            "MCP",
+            "AWS"
+          ]
+        },
+        {
           "title": "土木向け3Dシミュレーションソフトウェア開発",
-          "period": "2024/06 - Present",
+          "period": "2024/06 - 2026/03",
           "role": "フルスタックエンジニア",
           "teamSize": "9名（エンジニア7名、PM 2名）",
-          "description": "Three.jsによる土木工事向け3Dシミュレーションソフトウェアの開発。海外拠点のエンジニアと協業。",
+          "description": "Three.js / CesiumJS による土木工事向け3Dシミュレーションソフトウェアの開発。海外拠点のエンジニアと協業。",
           "achievements": [
+            "CesiumJS上で水流予測機能を開発。水たまりの形成・流出点・流域・流下経路を地形上に3Dポイントプリミティブで可視化し、水害の未然防止を支援",
+            "同機能の開発事例を Cesium Developer Conference 2026（米・Philadelphia）にて発表",
             "共通コンポーネントライブラリの構築により、重複コードを約40%削減",
             "GIS勉強会を月次開催し、チーム全体の地理空間データ処理スキルを底上げ",
             "AIエージェント活用ガイドラインを策定、開発生産性を約30%向上",
             "外部QAチームとのテスト体制を構築し、リリース後の不具合報告を約50%削減",
             "ユーザビリティ分析に基づくUI再設計で、主要操作フローのステップ数を約30%削減"
           ],
+          "talk": {
+            "videoId": "N0d7fV9LRGg",
+            "title": "Water flow prediction visualization on CesiumJS for construction sites",
+            "event": "Cesium Developer Conference 2026",
+            "date": "2026/06 · Philadelphia, USA",
+            "href": "https://www.youtube.com/watch?v=N0d7fV9LRGg"
+          },
           "techs": [
             "TypeScript",
             "React",
             "Lit",
             "Three.js",
+            "CesiumJS",
             "Node.js",
             "Python",
             "AWS"
@@ -124,7 +169,7 @@
     {
       "company": "Techouse Inc.",
       "role": "Web Developer / Tech Lead",
-      "period": "2020/01 - 2024/06",
+      "period": "2020/01 - 2024/05",
       "description": "採用管理SaaSの開発・運用からフルリビルドまでを主導。",
       "techs": [
         "Ruby on Rails",
@@ -145,10 +190,10 @@
           "teamSize": "6名（PO 1名、BE 2名、FE 2名、QA 1名）",
           "description": "前プロジェクトをゼロベースでリビルド。テックリード・スクラムマスターを兼任。",
           "achievements": [
-            "React/TypeScriptの導入",
+            "React/TypeScriptの導入とComponent責務の整理、Auth0連携の設計",
             "Figmaによるデザインプロセスの確立",
             "DBスキーマの再設計（「人」軸→「応募」軸）",
-            "社内初のGraphQL基盤の設計・実装",
+            "社内初のGraphQL基盤の実装とエラーハンドリング方針の策定",
             "ドキュメント整備（Confluence、ユビキタス言語）",
             "スクラムイベントの効率化"
           ],

@@ -6,9 +6,9 @@
   "about": {
     "lines": [
       "Started my career in automotive control software development, where automating tests improved efficiency by 20x — sparking a passion for solving real-world problems through technology.",
-      "After transitioning to web development, I led the 0-to-1 launch of a recruitment management SaaS and a full rebuild of a legacy system. Over 8 years, I built a full-stack skill set spanning GraphQL API design, database schema redesign, and clean architecture adoption.",
-      "I've also served as tech lead and scrum master for teams of 10+. Currently developing 3D simulation software with Three.js, while single-handedly driving a new SaaS from architecture design through implementation and CI/CD on the side.",
-      "My driving principle is simplifying complexity — whether in technology selection, architecture design, or team building. Recently drawn to the intersection of WebGL/3D graphics and product development."
+      "After transitioning to web development, I led the 0-to-1 launch of a recruitment management SaaS and a full rebuild of a legacy system. Over 9 years, I built a full-stack skill set spanning GraphQL API design, database schema redesign, and clean architecture adoption.",
+      "I've also served as tech lead and scrum master for teams of 10+. After building 3D simulation software for civil engineering with Three.js and CesiumJS, I now work as a founding member of an in-house generative AI team, developing LLM- and agent-driven product features. In June 2026, I spoke at the Cesium Developer Conference 2026 about building water flow prediction on CesiumJS.",
+      "On the side, I lead a BtoB SaaS from 0 to 1 as tech lead, owning everything from architecture design to implementation, infrastructure, and CI/CD. My driving principle is simplifying complexity — staying hands-on from technology selection through team building."
     ]
   },
   "skills": [
@@ -18,6 +18,7 @@
     { "name": "HTML / CSS", "tier": "expert", "category": "frontend" },
     { "name": "Tailwind CSS", "tier": "proficient", "category": "frontend" },
     { "name": "Three.js", "tier": "proficient", "category": "frontend" },
+    { "name": "CesiumJS", "tier": "proficient", "category": "frontend" },
     { "name": "Figma", "tier": "proficient", "category": "frontend" },
     { "name": "Lit", "tier": "familiar", "category": "frontend" },
     { "name": "Ruby on Rails", "tier": "expert", "category": "backend" },
@@ -29,51 +30,60 @@
     { "name": "Docker", "tier": "expert", "category": "infra" },
     { "name": "CI/CD", "tier": "expert", "category": "infra" },
     { "name": "AWS", "tier": "proficient", "category": "infra" },
+    { "name": "Terraform", "tier": "proficient", "category": "infra" },
     { "name": "Claude Code", "tier": "expert", "category": "ai" },
     { "name": "Cursor", "tier": "expert", "category": "ai" },
+    { "name": "Claude / OpenAI API", "tier": "proficient", "category": "ai" },
+    { "name": "MCP", "tier": "proficient", "category": "ai" },
     { "name": "Codex", "tier": "proficient", "category": "ai" }
   ],
   "experiences": [
     {
       "company": "Freelance",
-      "role": "Full Stack Engineer / Architect",
-      "period": "2025/01 - Present",
-      "description": "Building a parking lot matching SaaS for logistics companies from scratch. Single-handedly leading tech selection, architecture, implementation, and CI/CD.",
+      "role": "Full Stack Engineer / Tech Lead",
+      "period": "2025/12 - Present",
+      "description": "Launching a BtoB parking lot matching SaaS for logistics companies. Owning everything from the BFF layer to infrastructure as the core engineer behind roughly 70% of all commits.",
       "techs": [
         "Next.js",
         "React",
         "TypeScript",
         "Prisma",
         "PostgreSQL",
+        "Redis",
         "Auth.js",
         "Playwright",
-        "AWS"
+        "AWS",
+        "Terraform"
       ],
       "projects": [
         {
           "title": "BtoB Rest-stop Parking Matching Service",
           "period": "2025/12 - Present",
-          "role": "Full Stack Engineer / Architect",
-          "teamSize": "2 members",
-          "description": "0-to-1 development of a membership-based parking sharing SaaS for logistics. In a 2-person team, single-handedly completed the application foundation design and implementation in 3 months.",
+          "role": "Full Stack Engineer / Tech Lead",
+          "teamSize": "6 members",
+          "description": "Joined as reviewer when every screen ran on mock data from non-engineer vibe coding. Built the BFF, auth, infrastructure, and CI/CD from a state with no backend at all.",
           "achievements": [
-            "Selected tech stack and designed Next.js App Router monolith architecture (4 roles × 6 domains)",
-            "Designed BFF layer and applied across all domains, building end-to-end type-safe dev foundation",
-            "Built auth infrastructure (Auth.js v5 / SMS OTP / RBAC) and designed DB schema (Drizzle → Prisma migration)",
-            "Built and parallelized CI/CD pipeline, set up E2E testing infrastructure (Playwright / POM)",
-            "Codified dev environment (Docker Compose / setup scripts) and overall DX improvements",
-            "Integrated AI agent (Claude Code) into dev workflow, achieving 730 commits in 3 months as a solo developer"
+            "Consolidated per-component mock data and replaced every screen with real data (companies, contracts, lots, reservations, vehicles, notifications)",
+            "Introduced Route Handler → Service → Repository clean architecture and redesigned the domain model around ContractPlan",
+            "Centralized authorization into a single createRoute() middleware gate that every Route Handler passes through",
+            "Built auth infrastructure (Auth.js v5 / SMS OTP / RBAC / account lockout / Redis rate limiting / timing attack mitigation)",
+            "Built ECS auto-deploy with GitHub Actions + ecspresso and an E2E test foundation with Playwright + Docker Compose",
+            "Integrated an AI agent (Claude Code) into the dev workflow, single-handedly delivering ~70% of all commits"
           ],
           "techs": [
             "Next.js",
             "TypeScript",
             "Prisma",
             "PostgreSQL",
+            "Redis",
             "Auth.js",
             "Tailwind CSS",
+            "TanStack Query",
+            "Zod",
             "Vitest",
             "Playwright",
             "AWS",
+            "ecspresso",
             "GitHub Actions",
             "Docker",
             "Terraform"
@@ -83,37 +93,72 @@
     },
     {
       "company": "EarthBrain Inc.",
-      "role": "Full Stack Engineer",
+      "role": "Full Stack Engineer → Generative AI Engineer",
       "period": "2024/06 - Present",
-      "description": "Developing 3D simulation software for civil engineering using Three.js.",
+      "description": "Built 3D simulation software for civil engineering, then joined the launch of the in-house generative AI team. Now focused on LLM- and agent-driven product development.",
       "techs": [
         "TypeScript",
         "React",
         "Lit",
         "Three.js",
+        "CesiumJS",
         "Node.js",
         "Python",
+        "Claude API",
         "AWS"
       ],
       "projects": [
         {
+          "title": "Generative AI Team Launch / LLM Product Development",
+          "period": "2026/04 - Present",
+          "role": "Generative AI Engineer (founding member)",
+          "teamSize": "2-3 members",
+          "description": "Joined the launch of a dedicated team driving generative AI adoption across construction DX products, covering everything from LLM feature implementation to company-wide AI enablement.",
+          "achievements": [
+            "Designed, implemented, and shipped production features powered by LLM APIs",
+            "Built the backend of a construction-site safety AI product with DDD and layered architecture",
+            "Implemented MCP servers exposing internal data platforms to AI agents across systems",
+            "Authored and rolled out company-wide AI usage rules and guidelines",
+            "Established a fast PoC loop to validate feasibility before committing to productization"
+          ],
+          "techs": [
+            "Python",
+            "TypeScript",
+            "Node.js",
+            "Claude API",
+            "OpenAI API",
+            "MCP",
+            "AWS"
+          ]
+        },
+        {
           "title": "3D Simulation Software for Civil Engineering",
-          "period": "2024/06 - Present",
+          "period": "2024/06 - 2026/03",
           "role": "Full Stack Engineer",
           "teamSize": "9 members (7 engineers, 2 PMs)",
-          "description": "Developing 3D simulation software for civil engineering using Three.js. Collaborating with engineers at overseas offices.",
+          "description": "Developed 3D simulation software for civil engineering with Three.js and CesiumJS, collaborating with engineers across overseas offices.",
           "achievements": [
+            "Built water flow prediction on CesiumJS, visualizing puddle formation, outflow points, watersheds, and flow paths as 3D point primitives on terrain to help prevent flood damage",
+            "Presented the work at the Cesium Developer Conference 2026 (Philadelphia, USA)",
             "Built shared component library, reducing duplicate code by ~40%",
             "Organized monthly GIS sessions, leveling up team-wide geospatial skills",
             "Established AI agent guidelines, boosting development productivity by ~30%",
             "Built QA partnership with external testers, reducing post-release bugs by ~50%",
             "Redesigned key UI flows based on usability analysis, cutting operation steps by ~30%"
           ],
+          "talk": {
+            "videoId": "N0d7fV9LRGg",
+            "title": "Water flow prediction visualization on CesiumJS for construction sites",
+            "event": "Cesium Developer Conference 2026",
+            "date": "2026/06 · Philadelphia, USA",
+            "href": "https://www.youtube.com/watch?v=N0d7fV9LRGg"
+          },
           "techs": [
             "TypeScript",
             "React",
             "Lit",
             "Three.js",
+            "CesiumJS",
             "Node.js",
             "Python",
             "AWS"
@@ -124,7 +169,7 @@
     {
       "company": "Techouse Inc.",
       "role": "Web Developer / Tech Lead",
-      "period": "2020/01 - 2024/06",
+      "period": "2020/01 - 2024/05",
       "description": "Led development, operations, and full rebuild of a recruitment management SaaS.",
       "techs": [
         "Ruby on Rails",
@@ -143,12 +188,12 @@
           "period": "2021/08 - 2024/05",
           "role": "Backend / Tech Lead",
           "teamSize": "6 members (PO 1, BE 2, FE 2, QA 1)",
-          "description": "Full ground-up rebuild of the previous project. Served as both tech lead and scrum master.",
+          "description": "Rebuilt the previous product from scratch. Served as both tech lead and scrum master.",
           "achievements": [
-            "Introduced React/TypeScript",
+            "Introduced React/TypeScript, clarified component responsibilities, and designed Auth0 integration",
             "Established design process with Figma",
             "Redesigned DB schema (from person-centric to application-centric)",
-            "Designed and implemented the company's first GraphQL API",
+            "Implemented the company's first GraphQL API and defined its error handling policy",
             "Improved documentation (Confluence, ubiquitous language)",
             "Streamlined scrum events"
           ],
@@ -199,7 +244,7 @@
           "period": "2018/07 - 2019/12",
           "role": "Design / Requirements",
           "teamSize": "2-3 members (20 in division)",
-          "description": "Software design and development for engine control units (ECU). Also participated in establishing a new office.",
+          "description": "Software design and development for engine control units (ECU). Also helped establish a new office location.",
           "achievements": [
             "Streamlined requirements definition (built search & diff tools with Excel/VBA)"
           ],
@@ -210,7 +255,7 @@
           "period": "2017/04 - 2018/07",
           "role": "QA / Test Automation",
           "teamSize": "5 members (15 in division)",
-          "description": "Control system development for power control units (PCU) of EV/hybrid vehicles.",
+          "description": "Control system development for power control units (PCU) in EV/hybrid vehicles.",
           "achievements": [
             "Standardized test items",
             "Parallelized MATLAB/Simulink simulations (reduced processing time by 1/3)",

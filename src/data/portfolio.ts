@@ -8,6 +8,14 @@ export interface Skill {
   category: 'frontend' | 'backend' | 'infra' | 'ai' | 'other';
 }
 
+export interface Talk {
+  videoId: string;
+  title: string;
+  event: string;
+  date: string;
+  href: string;
+}
+
 export interface Project {
   title: string;
   period: string;
@@ -15,6 +23,7 @@ export interface Project {
   teamSize: string;
   description: string;
   achievements: string[];
+  talk?: Talk;
   techs: string[];
 }
 

@@ -1,5 +1,6 @@
 import { usePortfolio } from '../../data/portfolio';
 import SectionTitle from '../ui/SectionTitle';
+import TalkEmbed from '../ui/TalkEmbed';
 import styles from './ExperienceSection.module.css';
 
 export default function ExperienceSection() {
@@ -43,6 +44,7 @@ export default function ExperienceSection() {
                         <li key={a}>{a}</li>
                       ))}
                     </ul>
+                    {proj.talk && <TalkEmbed talk={proj.talk} />}
                     <div className={styles.techs}>
                       {proj.techs.map((tech) => (
                         <span key={tech} className={styles.tagSm}>
